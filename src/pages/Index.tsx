@@ -1,6 +1,10 @@
 import { useState, useEffect, useCallback } from "react";
 import { Link } from "react-router-dom";
 import { ArrowRight, Gem, Scissors, Sparkles, UtensilsCrossed, Home as HomeIcon, PenTool, Wrench, Baby, Coffee, SprayCan, ChevronLeft, ChevronRight, Mail, Star, Flame, TrendingUp, Gift } from "lucide-react";
+import heroDeals from "@/assets/hero-deals.jpg";
+import heroTrending from "@/assets/hero-trending.jpg";
+import heroHome from "@/assets/hero-home.jpg";
+import heroKids from "@/assets/hero-kids.jpg";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -31,7 +35,7 @@ const heroSlides = [
     cta: "Shop Now",
     link: "/shop?category=beauty",
     badge: "🔥 Hot Deals",
-    gradient: "from-purple-start via-purple-mid to-purple-end",
+    image: heroDeals,
   },
   {
     title: "Trending Jewelry",
@@ -39,7 +43,7 @@ const heroSlides = [
     cta: "Explore Collection",
     link: "/shop?category=jewelry",
     badge: "✨ Trending",
-    gradient: "from-purple-mid via-accent to-purple-end",
+    image: heroTrending,
   },
   {
     title: "Home Essentials",
@@ -47,7 +51,7 @@ const heroSlides = [
     cta: "Shop Home",
     link: "/shop?category=kitchen",
     badge: "🏠 New Arrivals",
-    gradient: "from-purple-end via-purple-mid to-purple-start",
+    image: heroHome,
   },
   {
     title: "Kids' Favorites",
@@ -55,7 +59,7 @@ const heroSlides = [
     cta: "Shop for Kids",
     link: "/shop?category=toys",
     badge: "🎁 Gift Ideas",
-    gradient: "from-accent via-purple-mid to-purple-start",
+    image: heroKids,
   },
 ];
 
@@ -124,13 +128,14 @@ export default function Index() {
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: -100 }}
             transition={{ duration: 0.5 }}
-            className="gradient-purple relative"
+            className="relative"
           >
-            <div className="absolute inset-0 opacity-10">
-              <div className="absolute w-96 h-96 rounded-full bg-primary-foreground/20 -top-20 -right-20 blur-3xl" />
-              <div className="absolute w-64 h-64 rounded-full bg-primary-foreground/10 bottom-10 left-10 blur-2xl" />
-              <div className="absolute w-72 h-72 rounded-full bg-accent/20 top-1/2 left-1/3 blur-3xl" />
-            </div>
+            <img
+              src={heroSlides[currentSlide].image}
+              alt={heroSlides[currentSlide].title}
+              className="absolute inset-0 w-full h-full object-cover"
+            />
+            <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/40 to-transparent" />
             <div className="container mx-auto px-4 py-20 md:py-28 relative">
               <div className="max-w-2xl">
                 <motion.div
