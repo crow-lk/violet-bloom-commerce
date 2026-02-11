@@ -1,6 +1,41 @@
 import { Product } from "@/types/product";
 
-const img = (id: number) => `https://picsum.photos/seed/cp${id}/600/600`;
+import jewelryImg from "@/assets/products/jewelry.jpg";
+import hairImg from "@/assets/products/hair-accessories.jpg";
+import beautyImg from "@/assets/products/beauty.jpg";
+import kitchenImg from "@/assets/products/kitchen.jpg";
+import homeImg from "@/assets/products/home.jpg";
+import stationeryImg from "@/assets/products/stationery.jpg";
+import toolsImg from "@/assets/products/tools.jpg";
+import toysImg from "@/assets/products/toys.jpg";
+import ceramicsImg from "@/assets/products/ceramics.jpg";
+import cleaningImg from "@/assets/products/cleaning.jpg";
+
+const categoryImages: Record<string, string> = {
+  jewelry: jewelryImg,
+  "hair-accessories": hairImg,
+  beauty: beautyImg,
+  kitchen: kitchenImg,
+  home: homeImg,
+  stationery: stationeryImg,
+  tools: toolsImg,
+  toys: toysImg,
+  ceramics: ceramicsImg,
+  cleaning: cleaningImg,
+};
+
+const img = (id: number) => {
+  if (id <= 20) return jewelryImg;
+  if (id <= 30) return hairImg;
+  if (id <= 40) return beautyImg;
+  if (id <= 50) return kitchenImg;
+  if (id <= 60) return homeImg;
+  if (id <= 70) return stationeryImg;
+  if (id <= 80) return toolsImg;
+  if (id <= 90) return toysImg;
+  if (id <= 95) return ceramicsImg;
+  return cleaningImg;
+};
 
 export const products: Product[] = [
   // JEWELRY - Necklaces (10)

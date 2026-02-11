@@ -120,45 +120,45 @@ export default function Index() {
   return (
     <Layout>
       {/* Hero Image Slider */}
-      <section className="relative overflow-hidden">
+      <section className="relative overflow-hidden h-[400px] md:h-[520px]">
         <AnimatePresence mode="wait">
           <motion.div
             key={currentSlide}
-            initial={{ opacity: 0, x: 100 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: -100 }}
-            transition={{ duration: 0.5 }}
-            className="relative"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.6 }}
+            className="absolute inset-0"
           >
             <img
               src={heroSlides[currentSlide].image}
               alt={heroSlides[currentSlide].title}
               className="absolute inset-0 w-full h-full object-cover"
             />
-            <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/40 to-transparent" />
-            <div className="container mx-auto px-4 py-20 md:py-28 relative">
+            <div className="absolute inset-0 bg-gradient-to-r from-black/75 via-black/50 to-black/20" />
+            <div className="container mx-auto px-4 h-full flex items-center relative">
               <div className="max-w-2xl">
                 <motion.div
-                  initial={{ opacity: 0, y: 20 }}
+                  initial={{ opacity: 0, y: 30 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.2 }}
+                  transition={{ delay: 0.3, duration: 0.5 }}
                 >
-                  <Badge className="bg-primary-foreground/20 text-primary-foreground border-0 mb-4">
+                  <Badge className="bg-white/20 text-white border-0 mb-4 text-sm backdrop-blur-sm">
                     {heroSlides[currentSlide].badge}
                   </Badge>
-                  <h1 className="font-display text-4xl md:text-6xl font-bold text-primary-foreground leading-tight">
+                  <h1 className="font-display text-4xl md:text-6xl font-bold text-white leading-tight drop-shadow-lg">
                     {heroSlides[currentSlide].title}
                   </h1>
-                  <p className="text-primary-foreground/70 mt-4 text-lg md:text-xl">
+                  <p className="text-white/80 mt-4 text-lg md:text-xl drop-shadow">
                     {heroSlides[currentSlide].subtitle}
                   </p>
                   <div className="flex gap-3 mt-8">
-                    <Button asChild size="lg" className="bg-primary-foreground text-primary hover:bg-primary-foreground/90 font-semibold">
+                    <Button asChild size="lg" className="bg-white text-primary hover:bg-white/90 font-semibold shadow-lg">
                       <Link to={heroSlides[currentSlide].link}>
                         {heroSlides[currentSlide].cta} <ArrowRight className="ml-2 h-4 w-4" />
                       </Link>
                     </Button>
-                    <Button asChild size="lg" variant="outline" className="border-primary-foreground/30 text-primary-foreground hover:bg-primary-foreground/10">
+                    <Button asChild size="lg" variant="outline" className="border-white/50 text-white hover:bg-white/20 backdrop-blur-sm">
                       <Link to="/shop?filter=deals">All Deals</Link>
                     </Button>
                   </div>
@@ -171,25 +171,25 @@ export default function Index() {
         {/* Slider Controls */}
         <button
           onClick={prevSlide}
-          className="absolute left-4 top-1/2 -translate-y-1/2 z-10 p-2 rounded-full bg-primary-foreground/20 backdrop-blur-sm text-primary-foreground hover:bg-primary-foreground/30 transition-colors"
+          className="absolute left-4 top-1/2 -translate-y-1/2 z-10 p-3 rounded-full bg-white/30 backdrop-blur-md text-white hover:bg-white/50 transition-all shadow-lg border border-white/20"
         >
           <ChevronLeft className="h-6 w-6" />
         </button>
         <button
           onClick={nextSlide}
-          className="absolute right-4 top-1/2 -translate-y-1/2 z-10 p-2 rounded-full bg-primary-foreground/20 backdrop-blur-sm text-primary-foreground hover:bg-primary-foreground/30 transition-colors"
+          className="absolute right-4 top-1/2 -translate-y-1/2 z-10 p-3 rounded-full bg-white/30 backdrop-blur-md text-white hover:bg-white/50 transition-all shadow-lg border border-white/20"
         >
           <ChevronRight className="h-6 w-6" />
         </button>
 
         {/* Slide Indicators */}
-        <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2 z-10">
+        <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex gap-2 z-10">
           {heroSlides.map((_, i) => (
             <button
               key={i}
               onClick={() => setCurrentSlide(i)}
-              className={`w-3 h-3 rounded-full transition-all ${
-                i === currentSlide ? "bg-primary-foreground w-8" : "bg-primary-foreground/40"
+              className={`h-3 rounded-full transition-all shadow ${
+                i === currentSlide ? "bg-white w-10" : "bg-white/40 w-3 hover:bg-white/60"
               }`}
             />
           ))}
