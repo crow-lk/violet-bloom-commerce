@@ -14,6 +14,7 @@ import { motion, AnimatePresence } from "framer-motion";
 
 const BRANDS = [...new Set(products.map((p) => p.brand))].sort();
 const ITEMS_PER_PAGE = 12;
+const MAX_PRICE = Math.max(...products.map(p => p.price));
 
 export default function ShopPage() {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -25,7 +26,7 @@ export default function ShopPage() {
   const [category, setCategory] = useState<ProductCategory | "">(initialCategory || "");
   const [brand, setBrand] = useState("");
   const [sort, setSort] = useState("popularity");
-  const [priceRange, setPriceRange] = useState([0, 700000]);
+  const [priceRange, setPriceRange] = useState([0, MAX_PRICE]);
   const [view, setView] = useState<"grid" | "list">("grid");
   const [page, setPage] = useState(1);
   const [filtersOpen, setFiltersOpen] = useState(false);
@@ -53,11 +54,11 @@ export default function ShopPage() {
   const paginated = filtered.slice((page - 1) * ITEMS_PER_PAGE, page * ITEMS_PER_PAGE);
 
   const clearFilters = () => {
-    setSearch(""); setCategory(""); setBrand(""); setPriceRange([0, 700000]);
+    setSearch(""); setCategory(""); setBrand(""); setPriceRange([0, MAX_PRICE]);
     setSearchParams({});
   };
 
-  const activeFilterCount = [search, category, brand, filterDeals].filter(Boolean).length + (priceRange[0] > 0 || priceRange[1] < 700000 ? 1 : 0);
+  const activeFilterCount = [search, category, brand, filterDeals].filter(Boolean).length + (priceRange[0] > 0 || priceRange[1] < MAX_PRICE ? 1 : 0);
 
   return (
     <Layout>
@@ -161,8 +162,8 @@ export default function ShopPage() {
                       value={priceRange}
                       onValueChange={(v) => { setPriceRange(v); setPage(1); }}
                       min={0}
-                      max={700000}
-                      step={10000}
+                      max={MAX_PRICE}
+                      step={5000}
                       className="mt-4"
                     />
                     <div className="flex justify-between text-xs text-muted-foreground mt-2">

@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { ShoppingCart, Heart, User, Search, Menu, X, Zap } from "lucide-react";
+import { ShoppingCart, Heart, User, Search, Menu, X, ShoppingBag } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -39,9 +39,9 @@ export default function Navbar() {
           {/* Logo */}
           <Link to="/" className="flex items-center gap-2">
             <div className="gradient-purple p-2 rounded-lg">
-              <Zap className="h-5 w-5 text-primary-foreground" />
+              <ShoppingBag className="h-5 w-5 text-primary-foreground" />
             </div>
-            <span className="font-display text-xl font-bold text-gradient-purple">TechPulse</span>
+            <span className="font-display text-xl font-bold text-gradient-purple">ChuttakPay</span>
           </Link>
 
           {/* Desktop Nav */}
@@ -49,6 +49,7 @@ export default function Navbar() {
             <Link to="/" className="text-sm font-medium text-foreground/80 hover:text-primary transition-colors">Home</Link>
             <Link to="/shop" className="text-sm font-medium text-foreground/80 hover:text-primary transition-colors">Shop</Link>
             <Link to="/shop?filter=deals" className="text-sm font-medium text-foreground/80 hover:text-primary transition-colors">Deals</Link>
+            <Link to="/contact" className="text-sm font-medium text-foreground/80 hover:text-primary transition-colors">Contact</Link>
           </nav>
 
           {/* Actions */}
@@ -129,6 +130,7 @@ export default function Navbar() {
                 <Link to="/" onClick={() => setMobileMenuOpen(false)} className="px-2 py-2 text-sm font-medium hover:text-primary">Home</Link>
                 <Link to="/shop" onClick={() => setMobileMenuOpen(false)} className="px-2 py-2 text-sm font-medium hover:text-primary">Shop</Link>
                 <Link to="/shop?filter=deals" onClick={() => setMobileMenuOpen(false)} className="px-2 py-2 text-sm font-medium hover:text-primary">Deals</Link>
+                <Link to="/contact" onClick={() => setMobileMenuOpen(false)} className="px-2 py-2 text-sm font-medium hover:text-primary">Contact</Link>
                 <Link to="/account" onClick={() => setMobileMenuOpen(false)} className="px-2 py-2 text-sm font-medium hover:text-primary">Account</Link>
               </nav>
             </motion.div>

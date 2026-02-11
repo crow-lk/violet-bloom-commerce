@@ -14,7 +14,7 @@ export default function CheckoutPage() {
   const { items, subtotal, discountAmount, total, couponCode, couponDiscount, clearCart } = useCart();
   const [paymentMethod, setPaymentMethod] = useState("card");
   const [orderPlaced, setOrderPlaced] = useState(false);
-  const [orderId] = useState(() => `TP-${Date.now().toString(36).toUpperCase()}`);
+  const [orderId] = useState(() => `CP-${Date.now().toString(36).toUpperCase()}`);
   const navigate = useNavigate();
 
   if (items.length === 0 && !orderPlaced) {

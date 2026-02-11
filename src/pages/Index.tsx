@@ -1,6 +1,6 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Link } from "react-router-dom";
-import { ArrowRight, Smartphone, Laptop, Headphones, Watch, Tablet, Gamepad2, Camera, Cable, ChevronLeft, ChevronRight, Mail } from "lucide-react";
+import { ArrowRight, Gem, Scissors, Sparkles, UtensilsCrossed, Home as HomeIcon, PenTool, Wrench, Baby, Coffee, SprayCan, ChevronLeft, ChevronRight, Mail, Star, Flame, TrendingUp, Gift } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -8,18 +8,56 @@ import ProductCard from "@/components/products/ProductCard";
 import Layout from "@/components/layout/Layout";
 import { products, getFeaturedProducts, getTrendingProducts, getDiscountedProducts, formatPrice } from "@/data/products";
 import { CATEGORIES } from "@/types/product";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 
 const CATEGORY_ICONS: Record<string, React.ReactNode> = {
-  Smartphone: <Smartphone className="h-6 w-6" />,
-  Laptop: <Laptop className="h-6 w-6" />,
-  Cable: <Cable className="h-6 w-6" />,
-  Headphones: <Headphones className="h-6 w-6" />,
-  Watch: <Watch className="h-6 w-6" />,
-  Tablet: <Tablet className="h-6 w-6" />,
-  Gamepad2: <Gamepad2 className="h-6 w-6" />,
-  Camera: <Camera className="h-6 w-6" />,
+  Gem: <Gem className="h-6 w-6" />,
+  Scissors: <Scissors className="h-6 w-6" />,
+  Sparkles: <Sparkles className="h-6 w-6" />,
+  UtensilsCrossed: <UtensilsCrossed className="h-6 w-6" />,
+  Home: <HomeIcon className="h-6 w-6" />,
+  PenTool: <PenTool className="h-6 w-6" />,
+  Wrench: <Wrench className="h-6 w-6" />,
+  Baby: <Baby className="h-6 w-6" />,
+  Coffee: <Coffee className="h-6 w-6" />,
+  SprayCan: <SprayCan className="h-6 w-6" />,
 };
+
+// Hero Slider Data
+const heroSlides = [
+  {
+    title: "Discover Amazing Deals",
+    subtitle: "Up to 33% OFF on Beauty & Care",
+    cta: "Shop Now",
+    link: "/shop?category=beauty",
+    badge: "🔥 Hot Deals",
+    gradient: "from-purple-start via-purple-mid to-purple-end",
+  },
+  {
+    title: "Trending Jewelry",
+    subtitle: "Elegant necklaces, earrings & bracelets",
+    cta: "Explore Collection",
+    link: "/shop?category=jewelry",
+    badge: "✨ Trending",
+    gradient: "from-purple-mid via-accent to-purple-end",
+  },
+  {
+    title: "Home Essentials",
+    subtitle: "Kitchen, storage & cleaning at unbeatable prices",
+    cta: "Shop Home",
+    link: "/shop?category=kitchen",
+    badge: "🏠 New Arrivals",
+    gradient: "from-purple-end via-purple-mid to-purple-start",
+  },
+  {
+    title: "Kids' Favorites",
+    subtitle: "Toys, stationery & fun accessories",
+    cta: "Shop for Kids",
+    link: "/shop?category=toys",
+    badge: "🎁 Gift Ideas",
+    gradient: "from-accent via-purple-mid to-purple-start",
+  },
+];
 
 function CountdownTimer() {
   const [time, setTime] = useState({ hours: 5, minutes: 42, seconds: 18 });
@@ -57,54 +95,99 @@ export default function Index() {
   const featured = getFeaturedProducts();
   const trending = getTrendingProducts();
   const deals = getDiscountedProducts().slice(0, 4);
+  const [currentSlide, setCurrentSlide] = useState(0);
   const [carouselIdx, setCarouselIdx] = useState(0);
   const carouselProducts = trending.slice(0, 8);
 
+  const nextSlide = useCallback(() => {
+    setCurrentSlide((prev) => (prev + 1) % heroSlides.length);
+  }, []);
+
+  const prevSlide = useCallback(() => {
+    setCurrentSlide((prev) => (prev - 1 + heroSlides.length) % heroSlides.length);
+  }, []);
+
+  // Auto-play slider
+  useEffect(() => {
+    const interval = setInterval(nextSlide, 5000);
+    return () => clearInterval(interval);
+  }, [nextSlide]);
+
   return (
     <Layout>
-      {/* Hero */}
-      <section className="gradient-purple relative overflow-hidden">
-        <div className="absolute inset-0 opacity-10">
-          <div className="absolute w-96 h-96 rounded-full bg-primary-foreground/20 -top-20 -right-20 blur-3xl" />
-          <div className="absolute w-64 h-64 rounded-full bg-primary-foreground/10 bottom-10 left-10 blur-2xl" />
-        </div>
-        <div className="container mx-auto px-4 py-16 md:py-24 relative">
-          <div className="grid md:grid-cols-2 gap-8 items-center">
-            <motion.div initial={{ opacity: 0, x: -40 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.6 }}>
-              <Badge className="bg-primary-foreground/20 text-primary-foreground border-0 mb-4">🔥 New Arrivals</Badge>
-              <h1 className="font-display text-4xl md:text-6xl font-bold text-primary-foreground leading-tight">
-                Next-Gen Tech<br />
-                <span className="text-primary-foreground/80">At Your Fingertips</span>
-              </h1>
-              <p className="text-primary-foreground/70 mt-4 text-lg max-w-md">
-                Discover the latest electronics with exclusive deals, fast delivery, and Mintpay BNPL options.
-              </p>
-              <div className="flex gap-3 mt-8">
-                <Button asChild size="lg" className="bg-primary-foreground text-primary hover:bg-primary-foreground/90 font-semibold">
-                  <Link to="/shop">Shop Now <ArrowRight className="ml-2 h-4 w-4" /></Link>
-                </Button>
-                <Button asChild size="lg" variant="outline" className="border-primary-foreground/30 text-primary-foreground hover:bg-primary-foreground/10">
-                  <Link to="/shop?filter=deals">View Deals</Link>
-                </Button>
-              </div>
-            </motion.div>
-            <motion.div
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.6, delay: 0.2 }}
-              className="hidden md:block"
-            >
-              <div className="relative">
-                <div className="glass rounded-2xl p-6 shadow-purple-lg">
-                  <img src={featured[0]?.images[0]} alt={featured[0]?.name} className="w-full rounded-xl" />
-                  <div className="mt-4">
-                    <p className="font-display text-xl font-bold text-primary-foreground">{featured[0]?.name}</p>
-                    <p className="text-primary-foreground/80 text-2xl font-bold mt-1">{featured[0] && formatPrice(featured[0].price)}</p>
+      {/* Hero Image Slider */}
+      <section className="relative overflow-hidden">
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={currentSlide}
+            initial={{ opacity: 0, x: 100 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: -100 }}
+            transition={{ duration: 0.5 }}
+            className="gradient-purple relative"
+          >
+            <div className="absolute inset-0 opacity-10">
+              <div className="absolute w-96 h-96 rounded-full bg-primary-foreground/20 -top-20 -right-20 blur-3xl" />
+              <div className="absolute w-64 h-64 rounded-full bg-primary-foreground/10 bottom-10 left-10 blur-2xl" />
+              <div className="absolute w-72 h-72 rounded-full bg-accent/20 top-1/2 left-1/3 blur-3xl" />
+            </div>
+            <div className="container mx-auto px-4 py-20 md:py-28 relative">
+              <div className="max-w-2xl">
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.2 }}
+                >
+                  <Badge className="bg-primary-foreground/20 text-primary-foreground border-0 mb-4">
+                    {heroSlides[currentSlide].badge}
+                  </Badge>
+                  <h1 className="font-display text-4xl md:text-6xl font-bold text-primary-foreground leading-tight">
+                    {heroSlides[currentSlide].title}
+                  </h1>
+                  <p className="text-primary-foreground/70 mt-4 text-lg md:text-xl">
+                    {heroSlides[currentSlide].subtitle}
+                  </p>
+                  <div className="flex gap-3 mt-8">
+                    <Button asChild size="lg" className="bg-primary-foreground text-primary hover:bg-primary-foreground/90 font-semibold">
+                      <Link to={heroSlides[currentSlide].link}>
+                        {heroSlides[currentSlide].cta} <ArrowRight className="ml-2 h-4 w-4" />
+                      </Link>
+                    </Button>
+                    <Button asChild size="lg" variant="outline" className="border-primary-foreground/30 text-primary-foreground hover:bg-primary-foreground/10">
+                      <Link to="/shop?filter=deals">All Deals</Link>
+                    </Button>
                   </div>
-                </div>
+                </motion.div>
               </div>
-            </motion.div>
-          </div>
+            </div>
+          </motion.div>
+        </AnimatePresence>
+
+        {/* Slider Controls */}
+        <button
+          onClick={prevSlide}
+          className="absolute left-4 top-1/2 -translate-y-1/2 z-10 p-2 rounded-full bg-primary-foreground/20 backdrop-blur-sm text-primary-foreground hover:bg-primary-foreground/30 transition-colors"
+        >
+          <ChevronLeft className="h-6 w-6" />
+        </button>
+        <button
+          onClick={nextSlide}
+          className="absolute right-4 top-1/2 -translate-y-1/2 z-10 p-2 rounded-full bg-primary-foreground/20 backdrop-blur-sm text-primary-foreground hover:bg-primary-foreground/30 transition-colors"
+        >
+          <ChevronRight className="h-6 w-6" />
+        </button>
+
+        {/* Slide Indicators */}
+        <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2 z-10">
+          {heroSlides.map((_, i) => (
+            <button
+              key={i}
+              onClick={() => setCurrentSlide(i)}
+              className={`w-3 h-3 rounded-full transition-all ${
+                i === currentSlide ? "bg-primary-foreground w-8" : "bg-primary-foreground/40"
+              }`}
+            />
+          ))}
         </div>
       </section>
 
@@ -112,8 +195,10 @@ export default function Index() {
       <section className="bg-gradient-to-r from-destructive/90 to-accent py-6 text-primary-foreground">
         <div className="container mx-auto px-4 flex flex-col md:flex-row items-center justify-between gap-4">
           <div>
-            <h2 className="font-display text-2xl font-bold">⚡ Flash Sale</h2>
-            <p className="text-sm opacity-90">Up to 30% off on selected electronics</p>
+            <h2 className="font-display text-2xl font-bold flex items-center gap-2">
+              <Flame className="h-6 w-6" /> Flash Sale
+            </h2>
+            <p className="text-sm opacity-90">Up to 33% off on selected items</p>
           </div>
           <CountdownTimer />
           <Button asChild className="bg-primary-foreground text-primary hover:bg-primary-foreground/90">
@@ -122,28 +207,103 @@ export default function Index() {
         </div>
       </section>
 
-      {/* Categories */}
+      {/* Categories Sidebar + Featured Content */}
       <section className="py-16">
         <div className="container mx-auto px-4">
-          <h2 className="font-display text-3xl font-bold text-center mb-2">Shop by Category</h2>
-          <p className="text-muted-foreground text-center mb-10">Find exactly what you're looking for</p>
-          <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-4">
+          <div className="flex gap-8">
+            {/* Categories Sidebar */}
+            <motion.aside
+              initial={{ opacity: 0, x: -20 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              className="hidden lg:block w-64 flex-shrink-0"
+            >
+              <div className="glass rounded-xl p-4 sticky top-24">
+                <h3 className="font-display font-semibold text-lg mb-4 flex items-center gap-2">
+                  <Gift className="h-5 w-5 text-primary" />
+                  Categories
+                </h3>
+                <nav className="space-y-1">
+                  {CATEGORIES.map((cat, i) => (
+                    <motion.div
+                      key={cat.id}
+                      initial={{ opacity: 0, x: -10 }}
+                      whileInView={{ opacity: 1, x: 0 }}
+                      transition={{ delay: i * 0.05 }}
+                      viewport={{ once: true }}
+                    >
+                      <Link
+                        to={`/shop?category=${cat.id}`}
+                        className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-foreground/80 hover:bg-primary/10 hover:text-primary transition-all group"
+                      >
+                        <div className="p-1.5 rounded-lg bg-secondary group-hover:bg-primary/20 transition-colors">
+                          {CATEGORY_ICONS[cat.icon]}
+                        </div>
+                        {cat.name}
+                      </Link>
+                    </motion.div>
+                  ))}
+                </nav>
+                <Link to="/shop" className="block mt-4">
+                  <Button variant="outline" className="w-full" size="sm">
+                    Browse All <ArrowRight className="ml-2 h-3 w-3" />
+                  </Button>
+                </Link>
+              </div>
+            </motion.aside>
+
+            {/* Featured Products Grid */}
+            <div className="flex-1">
+              <div className="flex items-center justify-between mb-6">
+                <div>
+                  <h2 className="font-display text-3xl font-bold flex items-center gap-2">
+                    <Star className="h-7 w-7 text-primary" /> Featured
+                  </h2>
+                  <p className="text-muted-foreground mt-1">Hand-picked favorites just for you</p>
+                </div>
+                <Link to="/shop" className="text-primary text-sm font-medium hover:underline flex items-center gap-1">
+                  View All <ArrowRight className="h-4 w-4" />
+                </Link>
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
+                {featured.slice(0, 6).map((p, i) => (
+                  <motion.div
+                    key={p.id}
+                    initial={{ opacity: 0, y: 20 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    transition={{ delay: i * 0.08 }}
+                    viewport={{ once: true }}
+                  >
+                    <ProductCard product={p} />
+                  </motion.div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Mobile Categories Grid */}
+      <section className="py-12 lg:hidden">
+        <div className="container mx-auto px-4">
+          <h2 className="font-display text-2xl font-bold text-center mb-6">Shop by Category</h2>
+          <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
             {CATEGORIES.map((cat, i) => (
               <motion.div
                 key={cat.id}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ delay: i * 0.05 }}
+                initial={{ opacity: 0, scale: 0.9 }}
+                whileInView={{ opacity: 1, scale: 1 }}
+                transition={{ delay: i * 0.04 }}
                 viewport={{ once: true }}
               >
                 <Link
                   to={`/shop?category=${cat.id}`}
-                  className="glass rounded-xl p-4 flex flex-col items-center gap-3 hover:shadow-purple transition-shadow group"
+                  className="glass rounded-xl p-3 flex flex-col items-center gap-2 hover:shadow-purple transition-shadow group"
                 >
-                  <div className="gradient-purple p-3 rounded-xl text-primary-foreground group-hover:scale-110 transition-transform">
+                  <div className="gradient-purple p-2.5 rounded-lg text-primary-foreground group-hover:scale-110 transition-transform">
                     {CATEGORY_ICONS[cat.icon]}
                   </div>
-                  <span className="text-sm font-medium">{cat.name}</span>
+                  <span className="text-xs font-medium text-center">{cat.name}</span>
                 </Link>
               </motion.div>
             ))}
@@ -155,9 +315,12 @@ export default function Index() {
       <section className="py-16 bg-muted/50">
         <div className="container mx-auto px-4">
           <div className="flex items-center justify-between mb-8">
-            <div>
-              <h2 className="font-display text-3xl font-bold">Trending Now</h2>
-              <p className="text-muted-foreground mt-1">Most popular products this week</p>
+            <div className="flex items-center gap-3">
+              <TrendingUp className="h-7 w-7 text-primary" />
+              <div>
+                <h2 className="font-display text-3xl font-bold">Trending Now</h2>
+                <p className="text-muted-foreground mt-1">Most popular products this week</p>
+              </div>
             </div>
             <div className="flex gap-2">
               <Button size="icon" variant="outline" onClick={() => setCarouselIdx(Math.max(0, carouselIdx - 1))} disabled={carouselIdx === 0}>
@@ -169,21 +332,38 @@ export default function Index() {
             </div>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {carouselProducts.slice(carouselIdx, carouselIdx + 4).map((p) => (
-              <ProductCard key={p.id} product={p} />
+            {carouselProducts.slice(carouselIdx, carouselIdx + 4).map((p, i) => (
+              <motion.div
+                key={p.id}
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: i * 0.1 }}
+              >
+                <ProductCard product={p} />
+              </motion.div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* Special Offers */}
+      {/* Hot Deals */}
       <section className="py-16">
         <div className="container mx-auto px-4">
-          <h2 className="font-display text-3xl font-bold text-center mb-2">🔥 Hot Deals</h2>
+          <h2 className="font-display text-3xl font-bold text-center mb-2 flex items-center justify-center gap-2">
+            <Flame className="h-7 w-7 text-destructive" /> Hot Deals
+          </h2>
           <p className="text-muted-foreground text-center mb-10">Don't miss these limited-time offers</p>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {deals.map((p) => (
-              <ProductCard key={p.id} product={p} />
+            {deals.map((p, i) => (
+              <motion.div
+                key={p.id}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ delay: i * 0.1 }}
+                viewport={{ once: true }}
+              >
+                <ProductCard product={p} />
+              </motion.div>
             ))}
           </div>
           <div className="text-center mt-8">
@@ -198,22 +378,32 @@ export default function Index() {
       <section className="py-16 bg-muted/50">
         <div className="container mx-auto px-4">
           <div className="grid md:grid-cols-2 gap-6">
-            <div className="gradient-purple rounded-2xl p-8 text-primary-foreground">
+            <motion.div
+              initial={{ opacity: 0, x: -20 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              className="gradient-purple rounded-2xl p-8 text-primary-foreground"
+            >
               <Badge className="bg-primary-foreground/20 border-0 text-primary-foreground mb-4">Limited Offer</Badge>
-              <h3 className="font-display text-2xl font-bold">Buy 1 Get 1 Free</h3>
-              <p className="mt-2 opacity-80">On selected accessories this weekend only.</p>
+              <h3 className="font-display text-2xl font-bold">Free Shipping Weekend</h3>
+              <p className="mt-2 opacity-80">Free delivery on all orders this weekend only.</p>
               <Button asChild className="mt-4 bg-primary-foreground text-primary hover:bg-primary-foreground/90">
-                <Link to="/shop?category=accessories">Shop Accessories</Link>
+                <Link to="/shop">Shop Now</Link>
               </Button>
-            </div>
-            <div className="bg-foreground rounded-2xl p-8 text-background">
+            </motion.div>
+            <motion.div
+              initial={{ opacity: 0, x: 20 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              className="bg-foreground rounded-2xl p-8 text-background"
+            >
               <Badge className="bg-primary border-0 text-primary-foreground mb-4">Mintpay</Badge>
               <h3 className="font-display text-2xl font-bold">Buy Now, Pay Later</h3>
               <p className="mt-2 opacity-80">Split your purchase into 3 easy payments with Mintpay. 0% interest.</p>
               <Button asChild className="mt-4" variant="secondary">
                 <Link to="/shop">Shop with Mintpay</Link>
               </Button>
-            </div>
+            </motion.div>
           </div>
         </div>
       </section>
@@ -221,7 +411,12 @@ export default function Index() {
       {/* Newsletter */}
       <section className="py-16">
         <div className="container mx-auto px-4">
-          <div className="glass rounded-2xl p-8 md:p-12 text-center max-w-2xl mx-auto shadow-purple">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="glass rounded-2xl p-8 md:p-12 text-center max-w-2xl mx-auto shadow-purple"
+          >
             <Mail className="h-10 w-10 mx-auto text-primary mb-4" />
             <h2 className="font-display text-2xl font-bold">Stay Updated</h2>
             <p className="text-muted-foreground mt-2">Subscribe to get exclusive deals and new arrival alerts.</p>
@@ -229,7 +424,7 @@ export default function Index() {
               <Input placeholder="Enter your email" type="email" className="flex-1" />
               <Button type="submit">Subscribe</Button>
             </form>
-          </div>
+          </motion.div>
         </div>
       </section>
     </Layout>

@@ -22,14 +22,16 @@ export interface Product {
 }
 
 export type ProductCategory =
-  | "phones"
-  | "laptops"
-  | "accessories"
-  | "audio"
-  | "wearables"
-  | "tablets"
-  | "gaming"
-  | "cameras";
+  | "jewelry"
+  | "hair-accessories"
+  | "beauty"
+  | "kitchen"
+  | "home"
+  | "stationery"
+  | "tools"
+  | "toys"
+  | "ceramics"
+  | "cleaning";
 
 export interface CartItem {
   product: Product;
@@ -71,12 +73,14 @@ export interface User {
 }
 
 export const CATEGORIES: { id: ProductCategory; name: string; icon: string }[] = [
-  { id: "phones", name: "Phones", icon: "Smartphone" },
-  { id: "laptops", name: "Laptops", icon: "Laptop" },
-  { id: "accessories", name: "Accessories", icon: "Cable" },
-  { id: "audio", name: "Audio", icon: "Headphones" },
-  { id: "wearables", name: "Wearables", icon: "Watch" },
-  { id: "tablets", name: "Tablets", icon: "Tablet" },
-  { id: "gaming", name: "Gaming", icon: "Gamepad2" },
-  { id: "cameras", name: "Cameras", icon: "Camera" },
+  { id: "jewelry", name: "Jewelry", icon: "Gem" },
+  { id: "hair-accessories", name: "Hair Accessories", icon: "Scissors" },
+  { id: "beauty", name: "Beauty & Care", icon: "Sparkles" },
+  { id: "kitchen", name: "Kitchen & Dining", icon: "UtensilsCrossed" },
+  { id: "home", name: "Home & Living", icon: "Home" },
+  { id: "stationery", name: "Stationery", icon: "PenTool" },
+  { id: "tools", name: "Tools & Hardware", icon: "Wrench" },
+  { id: "toys", name: "Toys & Kids", icon: "Baby" },
+  { id: "ceramics", name: "Ceramics & Dinnerware", icon: "Coffee" },
+  { id: "cleaning", name: "Cleaning Supplies", icon: "SprayCan" },
 ];
