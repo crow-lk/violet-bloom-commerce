@@ -34,7 +34,7 @@ const heroSlides = [
     subtitle: "Up to 33% OFF on Beauty & Care",
     cta: "Shop Now",
     link: "/shop?category=beauty",
-    badge: "🔥 Hot Deals",
+    badge: "Hot Deals",
     image: heroDeals,
   },
   {
@@ -42,7 +42,7 @@ const heroSlides = [
     subtitle: "Elegant necklaces, earrings & bracelets",
     cta: "Explore Collection",
     link: "/shop?category=jewelry",
-    badge: "✨ Trending",
+    badge: "Trending",
     image: heroTrending,
   },
   {
@@ -50,7 +50,7 @@ const heroSlides = [
     subtitle: "Kitchen, storage & cleaning at unbeatable prices",
     cta: "Shop Home",
     link: "/shop?category=kitchen",
-    badge: "🏠 New Arrivals",
+    badge: "New Arrivals",
     image: heroHome,
   },
   {
@@ -58,7 +58,7 @@ const heroSlides = [
     subtitle: "Toys, stationery & fun accessories",
     cta: "Shop for Kids",
     link: "/shop?category=toys",
-    badge: "🎁 Gift Ideas",
+    badge: "Gift Ideas",
     image: heroKids,
   },
 ];
@@ -120,7 +120,7 @@ export default function Index() {
   return (
     <Layout>
       {/* Hero Image Slider */}
-      <section className="relative overflow-hidden h-[400px] md:h-[520px]">
+      <section className="relative overflow-hidden h-[33vh]">
         <AnimatePresence mode="wait">
           <motion.div
             key={currentSlide}
