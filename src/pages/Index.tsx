@@ -34,7 +34,7 @@ const heroSlides = [
     subtitle: "Up to 33% OFF on Beauty & Care",
     cta: "Shop Now",
     link: "/shop?category=beauty",
-    badge: "Hot Deals",
+    badge: "🔥 Hot Deals",
     image: heroDeals,
   },
   {
@@ -42,7 +42,7 @@ const heroSlides = [
     subtitle: "Elegant necklaces, earrings & bracelets",
     cta: "Explore Collection",
     link: "/shop?category=jewelry",
-    badge: "Trending",
+    badge: "✨ Trending",
     image: heroTrending,
   },
   {
@@ -50,7 +50,7 @@ const heroSlides = [
     subtitle: "Kitchen, storage & cleaning at unbeatable prices",
     cta: "Shop Home",
     link: "/shop?category=kitchen",
-    badge: "New Arrivals",
+    badge: "🏠 New Arrivals",
     image: heroHome,
   },
   {
@@ -58,7 +58,7 @@ const heroSlides = [
     subtitle: "Toys, stationery & fun accessories",
     cta: "Shop for Kids",
     link: "/shop?category=toys",
-    badge: "Gift Ideas",
+    badge: "🎁 Gift Ideas",
     image: heroKids,
   },
 ];
@@ -80,15 +80,15 @@ function CountdownTimer() {
   }, []);
   const pad = (n: number) => n.toString().padStart(2, "0");
   return (
-    <div className="flex gap-1.5">
+    <div className="flex gap-2">
       {[
         { label: "HRS", value: pad(time.hours) },
         { label: "MIN", value: pad(time.minutes) },
         { label: "SEC", value: pad(time.seconds) },
       ].map((t) => (
-        <div key={t.label} className="bg-background/20 backdrop-blur-sm rounded-md px-2 py-1 text-center">
-          <p className="font-display text-base font-bold">{t.value}</p>
-          <p className="text-[10px] opacity-80">{t.label}</p>
+        <div key={t.label} className="bg-background/20 backdrop-blur-sm rounded-lg px-3 py-2 text-center">
+          <p className="font-display text-2xl font-bold">{t.value}</p>
+          <p className="text-xs opacity-80">{t.label}</p>
         </div>
       ))}
     </div>
@@ -120,7 +120,7 @@ export default function Index() {
   return (
     <Layout>
       {/* Hero Image Slider */}
-      <section className="relative overflow-hidden h-[33vh] max-w-[75vw] mx-auto rounded-xl mt-4">
+      <section className="relative overflow-hidden h-[400px] md:h-[520px]">
         <AnimatePresence mode="wait">
           <motion.div
             key={currentSlide}
@@ -197,13 +197,13 @@ export default function Index() {
       </section>
 
       {/* Flash Sale Banner */}
-      <section className="bg-gradient-to-r from-destructive/90 to-accent py-3 text-primary-foreground">
+      <section className="bg-gradient-to-r from-destructive/90 to-accent py-6 text-primary-foreground">
         <div className="container mx-auto px-4 flex flex-col md:flex-row items-center justify-between gap-4">
           <div>
-            <h2 className="font-display text-lg font-bold flex items-center gap-2">
-              <Flame className="h-5 w-5" /> Flash Sale
+            <h2 className="font-display text-2xl font-bold flex items-center gap-2">
+              <Flame className="h-6 w-6" /> Flash Sale
             </h2>
-            <p className="text-xs opacity-90">Up to 33% off on selected items</p>
+            <p className="text-sm opacity-90">Up to 33% off on selected items</p>
           </div>
           <CountdownTimer />
           <Button asChild className="bg-primary-foreground text-primary hover:bg-primary-foreground/90">

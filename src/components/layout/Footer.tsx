@@ -1,7 +1,9 @@
 import { Link } from "react-router-dom";
 import { ShoppingBag, Mail, Phone, MapPin, Facebook, Instagram } from "lucide-react";
+
 export default function Footer() {
-  return <footer className="gradient-purple text-primary-foreground">
+  return (
+    <footer className="gradient-purple text-primary-foreground">
       <div className="container mx-auto px-4 py-12">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           <div>
@@ -53,11 +55,12 @@ export default function Footer() {
             <a href="https://facebook.com" target="_blank" rel="noopener noreferrer" className="text-primary-foreground/60 hover:text-primary-foreground transition-colors"><Facebook className="h-5 w-5" /></a>
             <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" className="text-primary-foreground/60 hover:text-primary-foreground transition-colors"><Instagram className="h-5 w-5" /></a>
             <a href="https://tiktok.com" target="_blank" rel="noopener noreferrer" className="text-primary-foreground/60 hover:text-primary-foreground transition-colors">
-              <svg viewBox="0 0 24 24" fill="currentColor" className="h-5 w-5"><path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-2.88 2.5 2.89 2.89 0 01-2.89-2.89 2.89 2.89 0 012.89-2.89c.28 0 .54.04.79.1v-3.5a6.37 6.37 0 00-.79-.05A6.34 6.34 0 003.15 15.2a6.34 6.34 0 006.34 6.34 6.34 6.34 0 006.34-6.34V8.67a8.2 8.2 0 004.76 1.52v-3.5a4.84 4.84 0 01-1-.15z" /></svg>
+              <svg viewBox="0 0 24 24" fill="currentColor" className="h-5 w-5"><path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-2.88 2.5 2.89 2.89 0 01-2.89-2.89 2.89 2.89 0 012.89-2.89c.28 0 .54.04.79.1v-3.5a6.37 6.37 0 00-.79-.05A6.34 6.34 0 003.15 15.2a6.34 6.34 0 006.34 6.34 6.34 6.34 0 006.34-6.34V8.67a8.2 8.2 0 004.76 1.52v-3.5a4.84 4.84 0 01-1-.15z"/></svg>
             </a>
           </div>
-          <p>Powered by Crow.lk • Secure Payments</p>
+          <p>Powered by Mintpay • Secure Payments</p>
         </div>
       </div>
-    </footer>;
+    </footer>
+  );
 }

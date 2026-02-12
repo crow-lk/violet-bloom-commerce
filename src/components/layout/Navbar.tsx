@@ -29,10 +29,18 @@ export default function Navbar() {
     <header className="sticky top-0 z-50 glass-strong">
       <div className="container mx-auto px-4">
         {/* Top bar */}
-        <div className="gradient-purple-horizontal py-1.5 -mx-4 px-4 flex items-center justify-center">
+        <div className="gradient-purple-horizontal py-1.5 -mx-4 px-4 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <a href="https://facebook.com" target="_blank" rel="noopener noreferrer" className="text-primary-foreground/80 hover:text-primary-foreground transition-colors"><Facebook className="h-4 w-4" /></a>
+            <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" className="text-primary-foreground/80 hover:text-primary-foreground transition-colors"><Instagram className="h-4 w-4" /></a>
+            <a href="https://tiktok.com" target="_blank" rel="noopener noreferrer" className="text-primary-foreground/80 hover:text-primary-foreground transition-colors">
+              <svg viewBox="0 0 24 24" fill="currentColor" className="h-4 w-4"><path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-2.88 2.5 2.89 2.89 0 01-2.89-2.89 2.89 2.89 0 012.89-2.89c.28 0 .54.04.79.1v-3.5a6.37 6.37 0 00-.79-.05A6.34 6.34 0 003.15 15.2a6.34 6.34 0 006.34 6.34 6.34 6.34 0 006.34-6.34V8.67a8.2 8.2 0 004.76 1.52v-3.5a4.84 4.84 0 01-1-.15z"/></svg>
+            </a>
+          </div>
           <p className="text-sm font-medium text-primary-foreground">
             🔥 Flash Sale: Use code <span className="font-bold">FLASH30</span> for 30% OFF — Limited Time!
           </p>
+          <div className="w-20 hidden md:block" />
         </div>
 
         <div className="flex items-center justify-between h-16">
@@ -43,15 +51,6 @@ export default function Navbar() {
             </div>
             <span className="font-display text-xl font-bold text-gradient-purple">ChuttakPay</span>
           </Link>
-
-          {/* Social Icons */}
-          <div className="hidden md:flex items-center gap-3 ml-4">
-            <a href="https://facebook.com" target="_blank" rel="noopener noreferrer" className="text-foreground/60 hover:text-primary transition-colors"><Facebook className="h-4 w-4" /></a>
-            <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" className="text-foreground/60 hover:text-primary transition-colors"><Instagram className="h-4 w-4" /></a>
-            <a href="https://tiktok.com" target="_blank" rel="noopener noreferrer" className="text-foreground/60 hover:text-primary transition-colors">
-              <svg viewBox="0 0 24 24" fill="currentColor" className="h-4 w-4"><path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-2.88 2.5 2.89 2.89 0 01-2.89-2.89 2.89 2.89 0 012.89-2.89c.28 0 .54.04.79.1v-3.5a6.37 6.37 0 00-.79-.05A6.34 6.34 0 003.15 15.2a6.34 6.34 0 006.34 6.34 6.34 6.34 0 006.34-6.34V8.67a8.2 8.2 0 004.76 1.52v-3.5a4.84 4.84 0 01-1-.15z"/></svg>
-            </a>
-          </div>
 
           {/* Desktop Nav */}
           <nav className="hidden md:flex items-center gap-6">
