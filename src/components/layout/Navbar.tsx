@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo, useRef, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { ShoppingCart, Heart, User, Search, Menu, X, Facebook, Instagram } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -8,6 +8,7 @@ import { useCart } from "@/contexts/CartContext";
 import { useWishlist } from "@/contexts/WishlistContext";
 import { motion, AnimatePresence } from "framer-motion";
 import logo from "@/assets/logo.png";
+import { products } from "@/data/products";
 
 export default function Navbar() {
   const { itemCount } = useCart();
@@ -15,7 +16,27 @@ export default function Navbar() {
   const [searchOpen, setSearchOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+  const [showSuggestions, setShowSuggestions] = useState(false);
+  const searchRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
+
+  const suggestions = useMemo(() => {
+    if (searchQuery.trim().length < 2) return [];
+    const q = searchQuery.toLowerCase();
+    return products
+      .filter(p => p.name.toLowerCase().includes(q) || p.category.toLowerCase().includes(q) || p.tags.some(t => t.toLowerCase().includes(q)))
+      .slice(0, 6);
+  }, [searchQuery]);
+
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (searchRef.current && !searchRef.current.contains(e.target as Node)) {
+        setShowSuggestions(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -23,6 +44,7 @@ export default function Navbar() {
       navigate(`/shop?search=${encodeURIComponent(searchQuery.trim())}`);
       setSearchQuery("");
       setSearchOpen(false);
+      setShowSuggestions(false);
     }
   };
 
@@ -62,25 +84,66 @@ export default function Navbar() {
           {/* Actions */}
           <div className="flex items-center gap-2">
             {/* Search */}
-            <AnimatePresence>
-              {searchOpen && (
-                <motion.form
-                  initial={{ width: 0, opacity: 0 }}
-                  animate={{ width: 240, opacity: 1 }}
-                  exit={{ width: 0, opacity: 0 }}
-                  onSubmit={handleSearch}
-                  className="overflow-hidden"
-                >
-                  <Input
-                    placeholder="Search products..."
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    className="h-9"
-                    autoFocus
-                  />
-                </motion.form>
+            <div className="relative" ref={searchRef}>
+              <AnimatePresence>
+                {searchOpen && (
+                  <motion.form
+                    initial={{ width: 0, opacity: 0 }}
+                    animate={{ width: 240, opacity: 1 }}
+                    exit={{ width: 0, opacity: 0 }}
+                    onSubmit={handleSearch}
+                    className="overflow-hidden"
+                  >
+                    <Input
+                      placeholder="Search products..."
+                      value={searchQuery}
+                      onChange={(e) => {
+                        setSearchQuery(e.target.value);
+                        setShowSuggestions(true);
+                      }}
+                      onFocus={() => setShowSuggestions(true)}
+                      className="h-9"
+                      autoFocus
+                    />
+                  </motion.form>
+                )}
+              </AnimatePresence>
+              {/* Suggestions dropdown */}
+              {searchOpen && showSuggestions && suggestions.length > 0 && (
+                <div className="absolute top-full mt-1 w-60 right-0 bg-popover border border-border rounded-lg shadow-lg z-50 overflow-hidden">
+                  {suggestions.map((product) => (
+                    <Link
+                      key={product.id}
+                      to={`/product/${product.slug}`}
+                      onClick={() => {
+                        setSearchQuery("");
+                        setSearchOpen(false);
+                        setShowSuggestions(false);
+                      }}
+                      className="flex items-center gap-3 px-3 py-2 hover:bg-muted transition-colors"
+                    >
+                      <img src={product.images[0]} alt={product.name} className="h-8 w-8 rounded object-cover" />
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-medium truncate">{product.name}</p>
+                        <p className="text-xs text-muted-foreground">Rs. {product.price.toFixed(2)}</p>
+                      </div>
+                    </Link>
+                  ))}
+                  <button
+                    type="button"
+                    onClick={() => {
+                      navigate(`/shop?search=${encodeURIComponent(searchQuery.trim())}`);
+                      setSearchQuery("");
+                      setSearchOpen(false);
+                      setShowSuggestions(false);
+                    }}
+                    className="w-full text-center text-sm text-primary py-2 hover:bg-muted transition-colors border-t border-border"
+                  >
+                    View all results
+                  </button>
+                </div>
               )}
-            </AnimatePresence>
+            </div>
             <Button variant="ghost" size="icon" onClick={() => setSearchOpen(!searchOpen)}>
               <Search className="h-5 w-5" />
             </Button>
