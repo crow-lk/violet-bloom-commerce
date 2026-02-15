@@ -1,12 +1,13 @@
 import { useState, useMemo } from "react";
 import { useSearchParams } from "react-router-dom";
-import { Search, SlidersHorizontal, Grid3X3, List, X } from "lucide-react";
+import { SlidersHorizontal, Grid3X3, List, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { Slider } from "@/components/ui/slider";
 import ProductCard from "@/components/products/ProductCard";
+import SearchSuggestions from "@/components/products/SearchSuggestions";
 import Layout from "@/components/layout/Layout";
 import { products } from "@/data/products";
 import { CATEGORIES, ProductCategory } from "@/types/product";
@@ -72,15 +73,11 @@ export default function ShopPage() {
             <p className="text-muted-foreground mt-1">{filtered.length} products found</p>
           </div>
           <div className="flex items-center gap-2 w-full md:w-auto">
-            <div className="relative flex-1 md:w-64">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-              <Input
-                placeholder="Search products..."
-                value={search}
-                onChange={(e) => { setSearch(e.target.value); setPage(1); }}
-                className="pl-9"
-              />
-            </div>
+            <SearchSuggestions
+              value={search}
+              onChange={(v) => { setSearch(v); setPage(1); }}
+              className="flex-1 md:w-64"
+            />
             <Select value={sort} onValueChange={setSort}>
               <SelectTrigger className="w-40">
                 <SelectValue placeholder="Sort by" />
