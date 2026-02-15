@@ -158,7 +158,7 @@ export default function Index() {
                         {heroSlides[currentSlide].cta} <ArrowRight className="ml-2 h-4 w-4" />
                       </Link>
                     </Button>
-                    <Button asChild size="lg" variant="outline" className="border-white/50 text-white hover:bg-white/20 backdrop-blur-sm">
+                    <Button asChild size="lg" variant="outline" className="bg-transparent border-white/50 text-white hover:bg-white/20 hover:text-white backdrop-blur-sm">
                       <Link to="/shop?filter=deals">All Deals</Link>
                     </Button>
                   </div>
