@@ -1,12 +1,13 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { ShoppingCart, Heart, User, Search, Menu, X, ShoppingBag, Facebook, Instagram } from "lucide-react";
+import { ShoppingCart, Heart, User, Search, Menu, X, Facebook, Instagram } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { useCart } from "@/contexts/CartContext";
 import { useWishlist } from "@/contexts/WishlistContext";
 import { motion, AnimatePresence } from "framer-motion";
+import logo from "@/assets/logo.png";
 
 export default function Navbar() {
   const { itemCount } = useCart();
@@ -46,9 +47,7 @@ export default function Navbar() {
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
           <Link to="/" className="flex items-center gap-2">
-            <div className="gradient-purple p-2 rounded-lg">
-              <ShoppingBag className="h-5 w-5 text-primary-foreground" />
-            </div>
+            <img src={logo} alt="ChuttakPay" className="h-10 w-10 rounded-lg object-cover" />
             <span className="font-display text-xl font-bold text-gradient-purple">ChuttakPay</span>
           </Link>
 

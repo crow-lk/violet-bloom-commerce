@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
-import { ShoppingBag, Mail, Phone, MapPin, Facebook, Instagram } from "lucide-react";
+import { Mail, Phone, MapPin, Facebook, Instagram } from "lucide-react";
+import logo from "@/assets/logo.png";
 
 export default function Footer() {
   return (
@@ -8,9 +9,7 @@ export default function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           <div>
             <div className="flex items-center gap-2 mb-4">
-              <div className="bg-primary-foreground/20 p-2 rounded-lg">
-                <ShoppingBag className="h-5 w-5" />
-              </div>
+              <img src={logo} alt="ChuttakPay" className="h-10 w-10 rounded-lg object-cover" />
               <span className="font-display text-xl font-bold">ChuttakPay</span>
             </div>
             <p className="text-sm text-primary-foreground/80">
