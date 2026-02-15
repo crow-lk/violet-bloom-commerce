@@ -158,7 +158,7 @@ export default function Index() {
                         {heroSlides[currentSlide].cta} <ArrowRight className="ml-2 h-4 w-4" />
                       </Link>
                     </Button>
-                    <Button asChild size="lg" variant="outline" className="border-primary/50 text-primary bg-transparent hover:bg-primary/10 backdrop-blur-sm">
+                    <Button asChild size="lg" variant="outline" className="border-white/50 text-white hover:bg-white/20 backdrop-blur-sm">
                       <Link to="/shop?filter=deals">All Deals</Link>
                     </Button>
                   </div>
@@ -372,7 +372,7 @@ export default function Index() {
             ))}
           </div>
           <div className="text-center mt-8">
-            <Button asChild variant="outline" size="lg" className="border-primary/50 text-primary bg-transparent hover:bg-primary/10">
+            <Button asChild variant="outline" size="lg">
               <Link to="/shop?filter=deals">View All Deals <ArrowRight className="ml-2 h-4 w-4" /></Link>
             </Button>
           </div>
