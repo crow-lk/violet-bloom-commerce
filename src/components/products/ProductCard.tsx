@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 import { Heart, ShoppingCart, Star } from "lucide-react";
 import { Product } from "@/types/product";
-import { formatPrice } from "@/data/products";
+import { formatPrice } from "@/lib/format";
 import { useCart } from "@/contexts/CartContext";
 import { useWishlist } from "@/contexts/WishlistContext";
 import { Badge } from "@/components/ui/badge";
@@ -18,6 +18,7 @@ export default function ProductCard({ product, view = "grid" }: ProductCardProps
   const { addItem } = useCart();
   const { toggleWishlist, isInWishlist } = useWishlist();
   const wishlisted = isInWishlist(product.id);
+  const showPrice = !product.inquiryOnly && product.price > 0;
 
   if (view === "list") {
     return (
@@ -39,17 +40,23 @@ export default function ProductCard({ product, view = "grid" }: ProductCardProps
               </div>
               {product.discount && <Badge className="gradient-purple text-primary-foreground border-0">{product.discount}% OFF</Badge>}
             </div>
-            <p className="text-sm text-muted-foreground mt-1">{product.shortDescription}</p>
-            <div className="flex items-center gap-1 mt-2">
-              <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
-              <span className="text-sm font-medium">{product.rating}</span>
-              <span className="text-xs text-muted-foreground">({product.reviewCount})</span>
-            </div>
+            {product.shortDescription && <p className="text-sm text-muted-foreground mt-1">{product.shortDescription}</p>}
+            {product.rating !== undefined && (
+              <div className="flex items-center gap-1 mt-2">
+                <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
+                <span className="text-sm font-medium">{product.rating}</span>
+                {product.reviewCount !== undefined && (
+                  <span className="text-xs text-muted-foreground">({product.reviewCount})</span>
+                )}
+              </div>
+            )}
           </div>
           <div className="flex items-center justify-between mt-3">
             <div className="flex items-center gap-2">
-              <span className="font-display font-bold text-lg text-primary">{formatPrice(product.price)}</span>
-              {product.originalPrice && (
+              <span className="font-display font-bold text-lg text-primary">
+                {showPrice ? formatPrice(product.price) : "Contact for price"}
+              </span>
+              {showPrice && product.originalPrice && (
                 <span className="text-sm text-muted-foreground line-through">{formatPrice(product.originalPrice)}</span>
               )}
             </div>
@@ -116,18 +123,26 @@ export default function ProductCard({ product, view = "grid" }: ProductCardProps
         <Link to={`/product/${product.slug}`}>
           <h3 className="font-display font-semibold mt-1 line-clamp-1 hover:text-primary transition-colors">{product.name}</h3>
         </Link>
-        <p className="text-xs text-muted-foreground mt-1 line-clamp-1">{product.shortDescription}</p>
+        {product.shortDescription && (
+          <p className="text-xs text-muted-foreground mt-1 line-clamp-1">{product.shortDescription}</p>
+        )}
 
-        <div className="flex items-center gap-1 mt-2">
-          <Star className="h-3.5 w-3.5 fill-yellow-400 text-yellow-400" />
-          <span className="text-sm font-medium">{product.rating}</span>
-          <span className="text-xs text-muted-foreground">({product.reviewCount})</span>
-        </div>
+        {product.rating !== undefined && (
+          <div className="flex items-center gap-1 mt-2">
+            <Star className="h-3.5 w-3.5 fill-yellow-400 text-yellow-400" />
+            <span className="text-sm font-medium">{product.rating}</span>
+            {product.reviewCount !== undefined && (
+              <span className="text-xs text-muted-foreground">({product.reviewCount})</span>
+            )}
+          </div>
+        )}
 
         <div className="flex items-center justify-between mt-3">
           <div>
-            <span className="font-display font-bold text-primary">{formatPrice(product.price)}</span>
-            {product.originalPrice && (
+            <span className="font-display font-bold text-primary">
+              {showPrice ? formatPrice(product.price) : "Contact for price"}
+            </span>
+            {showPrice && product.originalPrice && (
               <span className="text-xs text-muted-foreground line-through ml-2">{formatPrice(product.originalPrice)}</span>
             )}
           </div>

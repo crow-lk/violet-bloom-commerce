@@ -10,11 +10,21 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import ProductCard from "@/components/products/ProductCard";
 import Layout from "@/components/layout/Layout";
-import { products, getFeaturedProducts, getTrendingProducts, getDiscountedProducts, formatPrice } from "@/data/products";
+import { useCatalog } from "@/hooks/useCatalog";
 import { CATEGORIES } from "@/types/product";
 import { motion, AnimatePresence } from "framer-motion";
 
 const CATEGORY_ICONS: Record<string, React.ReactNode> = {
+  jewelry: <Gem className="h-6 w-6" />,
+  "hair-accessories": <Scissors className="h-6 w-6" />,
+  beauty: <Sparkles className="h-6 w-6" />,
+  kitchen: <UtensilsCrossed className="h-6 w-6" />,
+  home: <HomeIcon className="h-6 w-6" />,
+  stationery: <PenTool className="h-6 w-6" />,
+  tools: <Wrench className="h-6 w-6" />,
+  toys: <Baby className="h-6 w-6" />,
+  ceramics: <Coffee className="h-6 w-6" />,
+  cleaning: <SprayCan className="h-6 w-6" />,
   Gem: <Gem className="h-6 w-6" />,
   Scissors: <Scissors className="h-6 w-6" />,
   Sparkles: <Sparkles className="h-6 w-6" />,
@@ -26,6 +36,8 @@ const CATEGORY_ICONS: Record<string, React.ReactNode> = {
   Coffee: <Coffee className="h-6 w-6" />,
   SprayCan: <SprayCan className="h-6 w-6" />,
 };
+
+const resolveCategoryIcon = (key: string) => CATEGORY_ICONS[key] || <Gem className="h-6 w-6" />;
 
 // Hero Slider Data
 const heroSlides = [
@@ -96,12 +108,22 @@ function CountdownTimer() {
 }
 
 export default function Index() {
-  const featured = getFeaturedProducts();
-  const trending = getTrendingProducts();
-  const deals = getDiscountedProducts().slice(0, 4);
+  const { products, categories } = useCatalog();
+  const featured = products.filter((p) => p.isFeatured).slice(0, 6);
+  const trending = products.filter((p) => p.isTrending).slice(0, 8);
+  const deals = products
+    .filter((p) => (p.discount || 0) > 0)
+    .sort((a, b) => (b.discount || 0) - (a.discount || 0))
+    .slice(0, 4);
+  const fallbackFeatured = featured.length ? featured : products.slice(0, 6);
+  const fallbackTrending = trending.length ? trending : products.slice(0, 8);
+  const fallbackDeals = deals.length ? deals : products.slice(0, 4);
   const [currentSlide, setCurrentSlide] = useState(0);
   const [carouselIdx, setCarouselIdx] = useState(0);
-  const carouselProducts = trending.slice(0, 8);
+  const carouselProducts = fallbackTrending.slice(0, 8);
+  const categoryList = categories.length
+    ? categories.map((cat) => ({ id: cat.slug, name: cat.name, icon: cat.slug }))
+    : CATEGORIES;
 
   const nextSlide = useCallback(() => {
     setCurrentSlide((prev) => (prev + 1) % heroSlides.length);
@@ -229,7 +251,7 @@ export default function Index() {
                   Categories
                 </h3>
                 <nav className="space-y-1">
-                  {CATEGORIES.map((cat, i) => (
+                  {categoryList.map((cat, i) => (
                     <motion.div
                       key={cat.id}
                       initial={{ opacity: 0, x: -10 }}
@@ -242,7 +264,7 @@ export default function Index() {
                         className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-foreground/80 hover:bg-primary/10 hover:text-primary transition-all group"
                       >
                         <div className="p-1.5 rounded-lg bg-secondary group-hover:bg-primary/20 transition-colors">
-                          {CATEGORY_ICONS[cat.icon]}
+                          {resolveCategoryIcon(cat.icon)}
                         </div>
                         {cat.name}
                       </Link>
@@ -271,7 +293,7 @@ export default function Index() {
                 </Link>
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
-                {featured.slice(0, 6).map((p, i) => (
+                {fallbackFeatured.slice(0, 6).map((p, i) => (
                   <motion.div
                     key={p.id}
                     initial={{ opacity: 0, y: 20 }}
@@ -293,7 +315,7 @@ export default function Index() {
         <div className="container mx-auto px-4">
           <h2 className="font-display text-2xl font-bold text-center mb-6">Shop by Category</h2>
           <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
-            {CATEGORIES.map((cat, i) => (
+            {categoryList.map((cat, i) => (
               <motion.div
                 key={cat.id}
                 initial={{ opacity: 0, scale: 0.9 }}
@@ -306,7 +328,7 @@ export default function Index() {
                   className="glass rounded-xl p-3 flex flex-col items-center gap-2 hover:shadow-purple transition-shadow group"
                 >
                   <div className="gradient-purple p-2.5 rounded-lg text-primary-foreground group-hover:scale-110 transition-transform">
-                    {CATEGORY_ICONS[cat.icon]}
+                    {resolveCategoryIcon(cat.icon)}
                   </div>
                   <span className="text-xs font-medium text-center">{cat.name}</span>
                 </Link>
@@ -359,7 +381,7 @@ export default function Index() {
           </h2>
           <p className="text-muted-foreground text-center mb-10">Don't miss these limited-time offers</p>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {deals.map((p, i) => (
+            {fallbackDeals.map((p, i) => (
               <motion.div
                 key={p.id}
                 initial={{ opacity: 0, y: 20 }}

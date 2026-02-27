@@ -1,137 +1,163 @@
-import React, { createContext, useContext, useReducer, useEffect } from "react";
-import { CartItem, Product } from "@/types/product";
+import React, { createContext, useContext, useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "@/hooks/use-toast";
-
-interface CartState {
-  items: CartItem[];
-  couponCode: string | null;
-  couponDiscount: number;
-}
-
-type CartAction =
-  | { type: "ADD_ITEM"; product: Product; quantity?: number }
-  | { type: "REMOVE_ITEM"; productId: string }
-  | { type: "UPDATE_QUANTITY"; productId: string; quantity: number }
-  | { type: "CLEAR_CART" }
-  | { type: "APPLY_COUPON"; code: string; discount: number }
-  | { type: "REMOVE_COUPON" }
-  | { type: "LOAD_CART"; state: CartState };
-
-const COUPONS: Record<string, number> = {
-  SAVE10: 10,
-  WELCOME20: 20,
-  FLASH30: 30,
-  MEGA50: 50,
-};
-
-function cartReducer(state: CartState, action: CartAction): CartState {
-  switch (action.type) {
-    case "ADD_ITEM": {
-      const existing = state.items.find((i) => i.product.id === action.product.id);
-      if (existing) {
-        return {
-          ...state,
-          items: state.items.map((i) =>
-            i.product.id === action.product.id
-              ? { ...i, quantity: i.quantity + (action.quantity || 1) }
-              : i
-          ),
-        };
-      }
-      return { ...state, items: [...state.items, { product: action.product, quantity: action.quantity || 1 }] };
-    }
-    case "REMOVE_ITEM":
-      return { ...state, items: state.items.filter((i) => i.product.id !== action.productId) };
-    case "UPDATE_QUANTITY":
-      if (action.quantity <= 0) {
-        return { ...state, items: state.items.filter((i) => i.product.id !== action.productId) };
-      }
-      return {
-        ...state,
-        items: state.items.map((i) =>
-          i.product.id === action.productId ? { ...i, quantity: action.quantity } : i
-        ),
-      };
-    case "CLEAR_CART":
-      return { items: [], couponCode: null, couponDiscount: 0 };
-    case "APPLY_COUPON":
-      return { ...state, couponCode: action.code, couponDiscount: action.discount };
-    case "REMOVE_COUPON":
-      return { ...state, couponCode: null, couponDiscount: 0 };
-    case "LOAD_CART":
-      return action.state;
-    default:
-      return state;
-  }
-}
+import { addCartItem, clearCart as apiClearCart, getCart, mergeCart, removeCartItem, updateCartItem } from "@/lib/api";
+import { ApiCart } from "@/lib/api/types";
+import { useAuth } from "@/contexts/AuthContext";
+import { useCatalog } from "@/hooks/useCatalog";
+import { Product, CartItem } from "@/types/product";
+import { ensureCartSessionId } from "@/lib/cartSession";
 
 interface CartContextType {
   items: CartItem[];
-  couponCode: string | null;
-  couponDiscount: number;
-  addItem: (product: Product, quantity?: number) => void;
-  removeItem: (productId: string) => void;
-  updateQuantity: (productId: string, quantity: number) => void;
-  clearCart: () => void;
-  applyCoupon: (code: string) => boolean;
-  removeCoupon: () => void;
+  cartId?: string;
+  addItem: (product: Product, quantity?: number) => Promise<void>;
+  removeItem: (cartItemId: string) => Promise<void>;
+  updateQuantity: (cartItemId: string, quantity: number) => Promise<void>;
+  clearCart: () => Promise<void>;
   subtotal: number;
-  discountAmount: number;
+  taxTotal: number;
+  discountTotal: number;
   total: number;
   itemCount: number;
+  isLoading: boolean;
+  refresh: () => Promise<void>;
 }
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
 
-const initialState: CartState = { items: [], couponCode: null, couponDiscount: 0 };
+const toNumber = (value?: number | string | null) => {
+  if (value === null || value === undefined) return 0;
+  const num = typeof value === "string" ? Number(value) : value;
+  return Number.isFinite(num) ? num : 0;
+};
 
 export function CartProvider({ children }: { children: React.ReactNode }) {
-  const [state, dispatch] = useReducer(cartReducer, initialState);
+  const { token } = useAuth();
+  const { products } = useCatalog();
+  const [cart, setCart] = useState<ApiCart | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const sessionId = useMemo(() => ensureCartSessionId(), []);
+  const prevToken = useRef<string | null>(null);
+
+  const productMap = useMemo(() => {
+    return new Map(products.map((p) => [p.id, p]));
+  }, [products]);
+
+  const loadCart = async () => {
+    setIsLoading(true);
+    try {
+      const data = await getCart(token ? undefined : sessionId);
+      setCart(data);
+    } catch {
+      setCart(null);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const saved = localStorage.getItem("cart");
-    if (saved) {
-      try {
-        dispatch({ type: "LOAD_CART", state: JSON.parse(saved) });
-      } catch {}
-    }
-  }, []);
+    loadCart();
+  }, [token]);
 
   useEffect(() => {
-    localStorage.setItem("cart", JSON.stringify(state));
-  }, [state]);
+    const shouldMerge = token && token !== prevToken.current;
+    prevToken.current = token;
+    if (!shouldMerge) return;
+    if (!sessionId) return;
+    mergeCart({ session_id: sessionId })
+      .then((res) => setCart(res.cart))
+      .catch(() => loadCart());
+  }, [token, sessionId]);
 
-  const subtotal = state.items.reduce((sum, i) => sum + i.product.price * i.quantity, 0);
-  const discountAmount = Math.round(subtotal * (state.couponDiscount / 100));
-  const total = subtotal - discountAmount;
-  const itemCount = state.items.reduce((sum, i) => sum + i.quantity, 0);
+  const items: CartItem[] = useMemo(() => {
+    if (!cart?.items) return [];
+    return cart.items.map((item) => {
+      const product = productMap.get(String(item.product_id));
+      return {
+        id: String(item.id),
+        productId: String(item.product_id),
+        productSlug: product?.slug,
+        productName: item.product_name,
+        imageUrl: item.image_url || product?.images?.[0],
+        brand: product?.brand,
+        quantity: item.quantity,
+        unitPrice: toNumber(item.unit_price),
+        lineTotal: toNumber(item.line_total),
+      };
+    });
+  }, [cart, productMap]);
 
-  const addItem = (product: Product, quantity?: number) => {
-    dispatch({ type: "ADD_ITEM", product, quantity });
-    toast({ title: "Added to cart", description: `${product.name} added to your cart.` });
-  };
-  const removeItem = (productId: string) => dispatch({ type: "REMOVE_ITEM", productId });
-  const updateQuantity = (productId: string, quantity: number) =>
-    dispatch({ type: "UPDATE_QUANTITY", productId, quantity });
-  const clearCart = () => dispatch({ type: "CLEAR_CART" });
-  const applyCoupon = (code: string) => {
-    const discount = COUPONS[code.toUpperCase()];
-    if (discount) {
-      dispatch({ type: "APPLY_COUPON", code: code.toUpperCase(), discount });
-      toast({ title: "Coupon applied!", description: `You saved ${discount}%` });
-      return true;
+  const itemCount = items.reduce((sum, item) => sum + item.quantity, 0);
+
+  const addItem = async (product: Product, quantity = 1) => {
+    if (!product.defaultVariantId) {
+      toast({ title: "Unavailable", description: "This product cannot be added to cart yet.", variant: "destructive" });
+      return;
     }
-    toast({ title: "Invalid coupon", description: "This coupon code is not valid.", variant: "destructive" });
-    return false;
+    if (product.inquiryOnly) {
+      toast({ title: "Inquiry only", description: "This product is available on inquiry.", variant: "destructive" });
+      return;
+    }
+    try {
+      const res = await addCartItem({
+        product_variant_id: product.defaultVariantId,
+        quantity,
+        session_id: token ? undefined : sessionId,
+      });
+      setCart(res.cart);
+      toast({ title: "Added to cart", description: `${product.name} added to your cart.` });
+    } catch (error: any) {
+      toast({ title: "Unable to add", description: error?.message || "Please try again.", variant: "destructive" });
+    }
   };
-  const removeCoupon = () => dispatch({ type: "REMOVE_COUPON" });
+
+  const removeItem = async (cartItemId: string) => {
+    try {
+      const res = await removeCartItem(cartItemId, { session_id: token ? undefined : sessionId });
+      setCart(res.cart);
+    } catch (error: any) {
+      toast({ title: "Unable to remove", description: error?.message || "Please try again.", variant: "destructive" });
+    }
+  };
+
+  const updateQuantity = async (cartItemId: string, quantity: number) => {
+    if (quantity <= 0) {
+      await removeItem(cartItemId);
+      return;
+    }
+    try {
+      const res = await updateCartItem(cartItemId, { quantity, session_id: token ? undefined : sessionId });
+      setCart(res.cart);
+    } catch (error: any) {
+      toast({ title: "Unable to update", description: error?.message || "Please try again.", variant: "destructive" });
+    }
+  };
+
+  const clearCart = async () => {
+    try {
+      const res = await apiClearCart({ session_id: token ? undefined : sessionId });
+      setCart(res.cart || null);
+    } catch (error: any) {
+      toast({ title: "Unable to clear", description: error?.message || "Please try again.", variant: "destructive" });
+    }
+  };
 
   return (
     <CartContext.Provider
       value={{
-        items: state.items, couponCode: state.couponCode, couponDiscount: state.couponDiscount,
-        addItem, removeItem, updateQuantity, clearCart, applyCoupon, removeCoupon,
-        subtotal, discountAmount, total, itemCount,
+        items,
+        cartId: cart ? String(cart.id) : undefined,
+        addItem,
+        removeItem,
+        updateQuantity,
+        clearCart,
+        subtotal: toNumber(cart?.subtotal),
+        taxTotal: toNumber(cart?.tax_total),
+        discountTotal: toNumber(cart?.discount_total),
+        total: toNumber(cart?.grand_total),
+        itemCount,
+        isLoading,
+        refresh: loadCart,
       }}
     >
       {children}

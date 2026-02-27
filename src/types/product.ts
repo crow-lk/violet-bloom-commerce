@@ -2,40 +2,51 @@ export interface Product {
   id: string;
   name: string;
   slug: string;
-  description: string;
-  shortDescription: string;
+  description?: string;
+  shortDescription?: string;
   price: number;
   originalPrice?: number;
   discount?: number;
-  category: ProductCategory;
-  brand: string;
+  category?: string;
+  categoryId?: string;
+  brand?: string;
+  brandId?: string;
   images: string[];
-  rating: number;
-  reviewCount: number;
+  rating?: number;
+  reviewCount?: number;
   inStock: boolean;
-  specs: Record<string, string>;
-  tags: string[];
+  specs?: Record<string, string>;
+  tags?: string[];
   isFeatured?: boolean;
   isTrending?: boolean;
   isNewArrival?: boolean;
-  createdAt: string;
+  createdAt?: string;
+  defaultVariantId?: string;
+  variantSku?: string;
+  inquiryOnly?: boolean;
+  variants?: Array<{
+    id: number;
+    sku: string;
+    size_name?: string | null;
+    selling_price?: number | null;
+    quantity?: number | null;
+    status?: "active" | "inactive";
+    color?: { id: number; name: string; hex?: string | null } | null;
+  }>;
 }
 
-export type ProductCategory =
-  | "jewelry"
-  | "hair-accessories"
-  | "beauty"
-  | "kitchen"
-  | "home"
-  | "stationery"
-  | "tools"
-  | "toys"
-  | "ceramics"
-  | "cleaning";
+export type ProductCategory = string;
 
 export interface CartItem {
-  product: Product;
+  id: string;
+  productId: string;
+  productSlug?: string;
+  productName: string;
+  imageUrl?: string;
+  brand?: string;
   quantity: number;
+  unitPrice: number;
+  lineTotal: number;
 }
 
 export interface Order {

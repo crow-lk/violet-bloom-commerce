@@ -4,10 +4,11 @@ import { Button } from "@/components/ui/button";
 import Layout from "@/components/layout/Layout";
 import ProductCard from "@/components/products/ProductCard";
 import { useWishlist } from "@/contexts/WishlistContext";
-import { products } from "@/data/products";
+import { useCatalog } from "@/hooks/useCatalog";
 
 export default function WishlistPage() {
   const { wishlist } = useWishlist();
+  const { products } = useCatalog();
   const wishlistProducts = products.filter((p) => wishlist.includes(p.id));
 
   return (

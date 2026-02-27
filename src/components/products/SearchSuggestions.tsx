@@ -1,8 +1,9 @@
 import { useState, useRef, useEffect, useMemo } from "react";
 import { Search, X } from "lucide-react";
 import { Input } from "@/components/ui/input";
-import { products } from "@/data/products";
+import { useCatalog } from "@/hooks/useCatalog";
 import { useNavigate } from "react-router-dom";
+import { formatPrice } from "@/lib/format";
 
 interface SearchSuggestionsProps {
   value: string;
@@ -11,6 +12,7 @@ interface SearchSuggestionsProps {
 }
 
 export default function SearchSuggestions({ value, onChange, className }: SearchSuggestionsProps) {
+  const { products } = useCatalog();
   const [open, setOpen] = useState(false);
   const [highlighted, setHighlighted] = useState(-1);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -23,11 +25,11 @@ export default function SearchSuggestions({ value, onChange, className }: Search
       .filter(
         (p) =>
           p.name.toLowerCase().includes(q) ||
-          p.brand.toLowerCase().includes(q) ||
-          p.tags.some((t) => t.includes(q))
+          (p.brand || "").toLowerCase().includes(q) ||
+          (p.tags || []).some((t) => t.toLowerCase().includes(q))
       )
       .slice(0, 8);
-  }, [value]);
+  }, [value, products]);
 
   useEffect(() => {
     setOpen(suggestions.length > 0);
@@ -44,9 +46,9 @@ export default function SearchSuggestions({ value, onChange, className }: Search
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  const selectProduct = (productId: string) => {
+  const selectProduct = (slug: string) => {
     setOpen(false);
-    navigate(`/product/${productId}`);
+    navigate(`/product/${slug}`);
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -59,7 +61,7 @@ export default function SearchSuggestions({ value, onChange, className }: Search
       setHighlighted((h) => Math.max(h - 1, -1));
     } else if (e.key === "Enter" && highlighted >= 0) {
       e.preventDefault();
-      selectProduct(suggestions[highlighted].id);
+      selectProduct(suggestions[highlighted].slug);
     } else if (e.key === "Escape") {
       setOpen(false);
     }
@@ -90,7 +92,7 @@ export default function SearchSuggestions({ value, onChange, className }: Search
           {suggestions.map((product, i) => (
             <button
               key={product.id}
-              onClick={() => selectProduct(product.id)}
+              onClick={() => selectProduct(product.slug)}
               className={`w-full flex items-center gap-3 px-3 py-2.5 text-left text-sm hover:bg-accent transition-colors ${
                 i === highlighted ? "bg-accent" : ""
               }`}
@@ -102,7 +104,9 @@ export default function SearchSuggestions({ value, onChange, className }: Search
               />
               <div className="flex-1 min-w-0">
                 <p className="font-medium truncate text-foreground">{product.name}</p>
-                <p className="text-xs text-muted-foreground">{product.brand} · LKR {(product.price / 100).toLocaleString()}</p>
+                <p className="text-xs text-muted-foreground">
+                  {product.brand} · {product.price ? formatPrice(product.price) : "Contact for price"}
+                </p>
               </div>
             </button>
           ))}
