@@ -207,7 +207,7 @@ export default function ShopPage() {
           </AnimatePresence>
 
           {/* Products */}
-          <div className="flex-1">
+          <div className="flex-1 container mx-auto">
             {/* Active filters */}
             {activeFilterCount > 0 && (
               <div className="flex flex-wrap gap-2 mb-4">
@@ -222,7 +222,7 @@ export default function ShopPage() {
               </div>
             )}
 
-            <div className={view === "grid" ? "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6" : "flex flex-col gap-4"}>
+            <div className={view === "grid" ? "grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-4" : "flex flex-col gap-4"}>
               {paginated.map((p) => (
                 <ProductCard key={p.id} product={p} view={view} />
               ))}
@@ -238,13 +238,24 @@ export default function ShopPage() {
 
             {/* Pagination */}
             {totalPages > 1 && (
-              <div className="flex items-center justify-center gap-2 mt-8">
+              <div className="flex items-center justify-center flex-wrap gap-2 mt-8">
                 <Button variant="outline" size="sm" onClick={() => setPage(page - 1)} disabled={page === 1}>Previous</Button>
-                {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
-                  <Button key={p} variant={p === page ? "default" : "outline"} size="sm" onClick={() => setPage(p)} className="w-9">
-                    {p}
-                  </Button>
-                ))}
+                {Array.from({ length: totalPages }, (_, i) => i + 1)
+                  .filter((p) => p === 1 || p === totalPages || Math.abs(p - page) <= 1)
+                  .reduce<(number | "...")[]>((acc, p, idx, arr) => {
+                    if (idx > 0 && p - (arr[idx - 1] as number) > 1) acc.push("...");
+                    acc.push(p);
+                    return acc;
+                  }, [])
+                  .map((p, idx) =>
+                    p === "..." ? (
+                      <span key={`ellipsis-${idx}`} className="px-1 text-muted-foreground">…</span>
+                    ) : (
+                      <Button key={p} variant={p === page ? "default" : "outline"} size="sm" onClick={() => setPage(p as number)} className="w-9">
+                        {p}
+                      </Button>
+                    )
+                  )}
                 <Button variant="outline" size="sm" onClick={() => setPage(page + 1)} disabled={page === totalPages}>Next</Button>
               </div>
             )}

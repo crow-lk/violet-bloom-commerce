@@ -82,7 +82,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
         brand: product?.brand,
         quantity: item.quantity,
         unitPrice: toNumber(item.unit_price),
-        lineTotal: toNumber(item.line_total),
+        lineTotal: toNumber(item.line_total) || toNumber(item.unit_price) * item.quantity,
       };
     });
   }, [cart, productMap]);
@@ -151,10 +151,10 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
         removeItem,
         updateQuantity,
         clearCart,
-        subtotal: toNumber(cart?.subtotal),
+        subtotal: items.reduce((sum, i) => sum + i.lineTotal, 0) || toNumber(cart?.subtotal),
         taxTotal: toNumber(cart?.tax_total),
         discountTotal: toNumber(cart?.discount_total),
-        total: toNumber(cart?.grand_total),
+        total: (items.reduce((sum, i) => sum + i.lineTotal, 0) || toNumber(cart?.grand_total)) + toNumber(cart?.tax_total) - toNumber(cart?.discount_total),
         itemCount,
         isLoading,
         refresh: loadCart,

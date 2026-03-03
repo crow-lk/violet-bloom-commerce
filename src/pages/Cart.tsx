@@ -44,7 +44,7 @@ export default function CartPage() {
             <AnimatePresence>
               {items.map((item) => (
                 <motion.div
-                  key={item.product.id}
+                  key={item.id}
                   layout
                   exit={{ opacity: 0, x: -100 }}
                   className="glass rounded-xl p-4 flex gap-4"

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
 import { ChevronLeft, Star, ShoppingCart, Heart, Minus, Plus, Truck, Shield, RotateCcw } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -21,6 +21,10 @@ export default function ProductDetailPage() {
   const { toggleWishlist, isInWishlist } = useWishlist();
   const [selectedImage, setSelectedImage] = useState(0);
   const [quantity, setQuantity] = useState(1);
+
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: "instant" });
+  }, [slug]);
 
   if (isLoading) {
     return (
