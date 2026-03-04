@@ -1,17 +1,24 @@
-import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Trash2, Minus, Plus, ShoppingBag, Tag, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import Layout from "@/components/layout/Layout";
 import { useCart } from "@/contexts/CartContext";
-import { formatPrice } from "@/data/products";
+import { formatPrice } from "@/lib/format";
 import { motion, AnimatePresence } from "framer-motion";
 
 export default function CartPage() {
-  const { items, removeItem, updateQuantity, subtotal, discountAmount, total, couponCode, couponDiscount, applyCoupon, removeCoupon, itemCount } = useCart();
-  const [couponInput, setCouponInput] = useState("");
+  const { items, removeItem, updateQuantity, subtotal, taxTotal, discountTotal, total, itemCount, isLoading } = useCart();
   const navigate = useNavigate();
+
+  if (isLoading && items.length === 0) {
+    return (
+      <Layout>
+        <div className="container mx-auto px-4 py-16 text-center">
+          <p className="text-muted-foreground">Loading your cart...</p>
+        </div>
+      </Layout>
+    );
+  }
 
   if (items.length === 0) {
     return (
@@ -37,37 +44,37 @@ export default function CartPage() {
             <AnimatePresence>
               {items.map((item) => (
                 <motion.div
-                  key={item.product.id}
+                  key={item.id}
                   layout
                   exit={{ opacity: 0, x: -100 }}
                   className="glass rounded-xl p-4 flex gap-4"
                 >
-                  <Link to={`/product/${item.product.slug}`} className="w-24 h-24 flex-shrink-0">
-                    <img src={item.product.images[0]} alt={item.product.name} className="w-full h-full object-cover rounded-lg" />
+                  <Link to={item.productSlug ? `/product/${item.productSlug}` : "/shop"} className="w-24 h-24 flex-shrink-0">
+                    <img src={item.imageUrl || "/placeholder.svg"} alt={item.productName} className="w-full h-full object-cover rounded-lg" />
                   </Link>
                   <div className="flex-1">
                     <div className="flex justify-between">
                       <div>
-                        <Link to={`/product/${item.product.slug}`}>
-                          <h3 className="font-display font-semibold hover:text-primary transition-colors">{item.product.name}</h3>
+                        <Link to={item.productSlug ? `/product/${item.productSlug}` : "/shop"}>
+                          <h3 className="font-display font-semibold hover:text-primary transition-colors">{item.productName}</h3>
                         </Link>
-                        <p className="text-sm text-muted-foreground">{item.product.brand}</p>
+                        {item.brand && <p className="text-sm text-muted-foreground">{item.brand}</p>}
                       </div>
-                      <Button variant="ghost" size="icon" onClick={() => removeItem(item.product.id)}>
+                      <Button variant="ghost" size="icon" onClick={() => removeItem(item.id)}>
                         <Trash2 className="h-4 w-4 text-destructive" />
                       </Button>
                     </div>
                     <div className="flex items-center justify-between mt-3">
                       <div className="flex items-center glass rounded-lg">
-                        <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => updateQuantity(item.product.id, item.quantity - 1)}>
+                        <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => updateQuantity(item.id, item.quantity - 1)}>
                           <Minus className="h-3 w-3" />
                         </Button>
                         <span className="w-8 text-center text-sm font-medium">{item.quantity}</span>
-                        <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => updateQuantity(item.product.id, item.quantity + 1)}>
+                        <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => updateQuantity(item.id, item.quantity + 1)}>
                           <Plus className="h-3 w-3" />
                         </Button>
                       </div>
-                      <span className="font-display font-bold text-primary">{formatPrice(item.product.price * item.quantity)}</span>
+                      <span className="font-display font-bold text-primary">{formatPrice(item.lineTotal)}</span>
                     </div>
                   </div>
                 </motion.div>
@@ -84,10 +91,16 @@ export default function CartPage() {
                 <span className="text-muted-foreground">Subtotal</span>
                 <span>{formatPrice(subtotal)}</span>
               </div>
-              {couponCode && (
+              {discountTotal > 0 && (
                 <div className="flex justify-between text-sm text-success">
-                  <span className="flex items-center gap-1"><Tag className="h-3 w-3" /> {couponCode} (-{couponDiscount}%)</span>
-                  <span>-{formatPrice(discountAmount)}</span>
+                  <span className="flex items-center gap-1"><Tag className="h-3 w-3" /> Discount</span>
+                  <span>-{formatPrice(discountTotal)}</span>
+                </div>
+              )}
+              {taxTotal > 0 && (
+                <div className="flex justify-between text-sm">
+                  <span className="text-muted-foreground">Tax</span>
+                  <span>{formatPrice(taxTotal)}</span>
                 </div>
               )}
               <div className="flex justify-between text-sm">
@@ -100,27 +113,8 @@ export default function CartPage() {
               </div>
             </div>
 
-            {/* Coupon */}
-            <div className="mt-4">
-              {couponCode ? (
-                <div className="flex items-center justify-between p-2 bg-secondary rounded-lg">
-                  <span className="text-sm font-medium">🎉 {couponCode}</span>
-                  <Button variant="ghost" size="sm" onClick={removeCoupon}>Remove</Button>
-                </div>
-              ) : (
-                <div className="flex gap-2">
-                  <Input
-                    placeholder="Coupon code"
-                    value={couponInput}
-                    onChange={(e) => setCouponInput(e.target.value)}
-                    className="flex-1"
-                  />
-                  <Button variant="outline" onClick={() => { applyCoupon(couponInput); setCouponInput(""); }}>
-                    Apply
-                  </Button>
-                </div>
-              )}
-              <p className="text-xs text-muted-foreground mt-2">Try: SAVE10, WELCOME20, FLASH30</p>
+            <div className="mt-4 text-xs text-muted-foreground">
+              Discounts and taxes are calculated at checkout.
             </div>
 
             <Button className="w-full mt-6" size="lg" onClick={() => navigate("/checkout")}>

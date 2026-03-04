@@ -1,23 +1,20 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
 import { SlidersHorizontal, Grid3X3, List, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { Slider } from "@/components/ui/slider";
 import ProductCard from "@/components/products/ProductCard";
 import SearchSuggestions from "@/components/products/SearchSuggestions";
 import Layout from "@/components/layout/Layout";
-import { products } from "@/data/products";
+import { useCatalog } from "@/hooks/useCatalog";
 import { CATEGORIES, ProductCategory } from "@/types/product";
 import { motion, AnimatePresence } from "framer-motion";
-
-const BRANDS = [...new Set(products.map((p) => p.brand))].sort();
 const ITEMS_PER_PAGE = 12;
-const MAX_PRICE = Math.max(...products.map(p => p.price));
 
 export default function ShopPage() {
+  const { products, categories, brands, isLoading } = useCatalog();
   const [searchParams, setSearchParams] = useSearchParams();
   const initialCategory = searchParams.get("category") as ProductCategory | null;
   const initialSearch = searchParams.get("search") || "";
@@ -27,39 +24,75 @@ export default function ShopPage() {
   const [category, setCategory] = useState<ProductCategory | "">(initialCategory || "");
   const [brand, setBrand] = useState("");
   const [sort, setSort] = useState("popularity");
-  const [priceRange, setPriceRange] = useState([0, MAX_PRICE]);
+  const [priceRange, setPriceRange] = useState<[number, number]>([0, 0]);
   const [view, setView] = useState<"grid" | "list">("grid");
   const [page, setPage] = useState(1);
   const [filtersOpen, setFiltersOpen] = useState(false);
+  const maxPrice = useMemo(() => (products.length ? Math.max(...products.map((p) => p.price || 0)) : 0), [products]);
+  const brandList = useMemo(() => {
+    const fromApi = brands.map((b) => b.name).filter(Boolean);
+    if (fromApi.length) return [...new Set(fromApi)].sort();
+    return [...new Set(products.map((p) => p.brand).filter(Boolean))].sort();
+  }, [brands, products]);
+  const categoryList = categories.length
+    ? categories.map((c) => ({ id: c.slug, name: c.name }))
+    : CATEGORIES.map((c) => ({ id: c.id, name: c.name }));
+
+  useEffect(() => {
+    if (maxPrice <= 0) return;
+    setPriceRange((current) => {
+      if (current[0] === 0 && current[1] === 0) return [0, maxPrice];
+      return current;
+    });
+  }, [maxPrice]);
 
   const filtered = useMemo(() => {
     let result = [...products];
-    if (search) result = result.filter((p) => p.name.toLowerCase().includes(search.toLowerCase()) || p.brand.toLowerCase().includes(search.toLowerCase()) || p.tags.some((t) => t.includes(search.toLowerCase())));
+    if (search) {
+      const q = search.toLowerCase();
+      result = result.filter((p) =>
+        p.name.toLowerCase().includes(q) ||
+        (p.brand || "").toLowerCase().includes(q) ||
+        (p.tags || []).some((t) => t.toLowerCase().includes(q))
+      );
+    }
     if (category) result = result.filter((p) => p.category === category);
     if (brand) result = result.filter((p) => p.brand === brand);
     if (filterDeals) result = result.filter((p) => p.discount && p.discount > 0);
-    result = result.filter((p) => p.price >= priceRange[0] && p.price <= priceRange[1]);
+    if (priceRange[1] > 0) {
+      result = result.filter((p) => p.price >= priceRange[0] && p.price <= priceRange[1]);
+    }
 
     switch (sort) {
       case "price-low": result.sort((a, b) => a.price - b.price); break;
       case "price-high": result.sort((a, b) => b.price - a.price); break;
-      case "newest": result.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()); break;
-      case "rating": result.sort((a, b) => b.rating - a.rating); break;
+      case "newest": result.sort((a, b) => new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime()); break;
+      case "rating": result.sort((a, b) => (b.rating || 0) - (a.rating || 0)); break;
       case "discount": result.sort((a, b) => (b.discount || 0) - (a.discount || 0)); break;
-      default: result.sort((a, b) => b.reviewCount - a.reviewCount);
+      default: result.sort((a, b) => (b.reviewCount || 0) - (a.reviewCount || 0));
     }
     return result;
-  }, [search, category, brand, sort, priceRange, filterDeals]);
+  }, [products, search, category, brand, sort, priceRange, filterDeals]);
 
   const totalPages = Math.ceil(filtered.length / ITEMS_PER_PAGE);
   const paginated = filtered.slice((page - 1) * ITEMS_PER_PAGE, page * ITEMS_PER_PAGE);
 
   const clearFilters = () => {
-    setSearch(""); setCategory(""); setBrand(""); setPriceRange([0, MAX_PRICE]);
+    setSearch(""); setCategory(""); setBrand(""); setPriceRange([0, maxPrice]);
     setSearchParams({});
   };
 
-  const activeFilterCount = [search, category, brand, filterDeals].filter(Boolean).length + (priceRange[0] > 0 || priceRange[1] < MAX_PRICE ? 1 : 0);
+  const activeFilterCount = [search, category, brand, filterDeals].filter(Boolean).length + (priceRange[0] > 0 || (maxPrice > 0 && priceRange[1] < maxPrice) ? 1 : 0);
+
+  if (isLoading && products.length === 0) {
+    return (
+      <Layout>
+        <div className="container mx-auto px-4 py-16 text-center">
+          <p className="text-muted-foreground">Loading products...</p>
+        </div>
+      </Layout>
+    );
+  }
 
   return (
     <Layout>
@@ -68,7 +101,7 @@ export default function ShopPage() {
         <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 mb-8">
           <div>
             <h1 className="font-display text-3xl font-bold">
-              {filterDeals ? "🔥 Hot Deals" : category ? CATEGORIES.find((c) => c.id === category)?.name : "All Products"}
+              {filterDeals ? "🔥 Hot Deals" : category ? categoryList.find((c) => c.id === category)?.name : "All Products"}
             </h1>
             <p className="text-muted-foreground mt-1">{filtered.length} products found</p>
           </div>
@@ -123,7 +156,7 @@ export default function ShopPage() {
                   <div>
                     <p className="text-sm font-medium mb-2">Category</p>
                     <div className="flex flex-wrap gap-1.5">
-                      {CATEGORIES.map((c) => (
+                      {categoryList.map((c) => (
                         <Badge
                           key={c.id}
                           variant={category === c.id ? "default" : "outline"}
@@ -145,7 +178,7 @@ export default function ShopPage() {
                       </SelectTrigger>
                       <SelectContent>
                         <SelectItem value="all">All Brands</SelectItem>
-                        {BRANDS.map((b) => (
+                        {brandList.map((b) => (
                           <SelectItem key={b} value={b}>{b}</SelectItem>
                         ))}
                       </SelectContent>
@@ -159,13 +192,13 @@ export default function ShopPage() {
                       value={priceRange}
                       onValueChange={(v) => { setPriceRange(v); setPage(1); }}
                       min={0}
-                      max={MAX_PRICE}
-                      step={5000}
+                      max={maxPrice || 100}
+                      step={500}
                       className="mt-4"
                     />
                     <div className="flex justify-between text-xs text-muted-foreground mt-2">
-                      <span>LKR {(priceRange[0] / 100).toLocaleString()}</span>
-                      <span>LKR {(priceRange[1] / 100).toLocaleString()}</span>
+                      <span>LKR {priceRange[0].toLocaleString()}</span>
+                      <span>LKR {priceRange[1].toLocaleString()}</span>
                     </div>
                   </div>
                 </div>
@@ -174,17 +207,22 @@ export default function ShopPage() {
           </AnimatePresence>
 
           {/* Products */}
-          <div className="flex-1">
+          <div className="flex-1 container mx-auto">
             {/* Active filters */}
             {activeFilterCount > 0 && (
               <div className="flex flex-wrap gap-2 mb-4">
-                {category && <Badge variant="secondary" className="gap-1">Category: {category} <X className="h-3 w-3 cursor-pointer" onClick={() => setCategory("")} /></Badge>}
+                {category && (
+                  <Badge variant="secondary" className="gap-1">
+                    Category: {categoryList.find((c) => c.id === category)?.name || category}
+                    <X className="h-3 w-3 cursor-pointer" onClick={() => setCategory("")} />
+                  </Badge>
+                )}
                 {brand && <Badge variant="secondary" className="gap-1">Brand: {brand} <X className="h-3 w-3 cursor-pointer" onClick={() => setBrand("")} /></Badge>}
                 {search && <Badge variant="secondary" className="gap-1">Search: {search} <X className="h-3 w-3 cursor-pointer" onClick={() => setSearch("")} /></Badge>}
               </div>
             )}
 
-            <div className={view === "grid" ? "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6" : "flex flex-col gap-4"}>
+            <div className={view === "grid" ? "grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-4" : "flex flex-col gap-4"}>
               {paginated.map((p) => (
                 <ProductCard key={p.id} product={p} view={view} />
               ))}
@@ -200,13 +238,24 @@ export default function ShopPage() {
 
             {/* Pagination */}
             {totalPages > 1 && (
-              <div className="flex items-center justify-center gap-2 mt-8">
+              <div className="flex items-center justify-center flex-wrap gap-2 mt-8">
                 <Button variant="outline" size="sm" onClick={() => setPage(page - 1)} disabled={page === 1}>Previous</Button>
-                {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
-                  <Button key={p} variant={p === page ? "default" : "outline"} size="sm" onClick={() => setPage(p)} className="w-9">
-                    {p}
-                  </Button>
-                ))}
+                {Array.from({ length: totalPages }, (_, i) => i + 1)
+                  .filter((p) => p === 1 || p === totalPages || Math.abs(p - page) <= 1)
+                  .reduce<(number | "...")[]>((acc, p, idx, arr) => {
+                    if (idx > 0 && p - (arr[idx - 1] as number) > 1) acc.push("...");
+                    acc.push(p);
+                    return acc;
+                  }, [])
+                  .map((p, idx) =>
+                    p === "..." ? (
+                      <span key={`ellipsis-${idx}`} className="px-1 text-muted-foreground">…</span>
+                    ) : (
+                      <Button key={p} variant={p === page ? "default" : "outline"} size="sm" onClick={() => setPage(p as number)} className="w-9">
+                        {p}
+                      </Button>
+                    )
+                  )}
                 <Button variant="outline" size="sm" onClick={() => setPage(page + 1)} disabled={page === totalPages}>Next</Button>
               </div>
             )}

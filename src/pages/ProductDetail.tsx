@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
 import { ChevronLeft, Star, ShoppingCart, Heart, Minus, Plus, Truck, Shield, RotateCcw } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -6,19 +6,35 @@ import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import Layout from "@/components/layout/Layout";
 import ProductCard from "@/components/products/ProductCard";
-import { getProductBySlug, formatPrice, products } from "@/data/products";
+import { formatPrice } from "@/lib/format";
 import { useCart } from "@/contexts/CartContext";
 import { useWishlist } from "@/contexts/WishlistContext";
 import { cn } from "@/lib/utils";
 import { motion } from "framer-motion";
+import { useCatalog } from "@/hooks/useCatalog";
 
 export default function ProductDetailPage() {
   const { slug } = useParams();
-  const product = getProductBySlug(slug || "");
+  const { products, isLoading } = useCatalog();
+  const product = products.find((p) => p.slug === slug);
   const { addItem } = useCart();
   const { toggleWishlist, isInWishlist } = useWishlist();
   const [selectedImage, setSelectedImage] = useState(0);
   const [quantity, setQuantity] = useState(1);
+
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: "instant" });
+  }, [slug]);
+
+  if (isLoading) {
+    return (
+      <Layout>
+        <div className="container mx-auto px-4 py-16 text-center">
+          <p className="text-muted-foreground">Loading product details...</p>
+        </div>
+      </Layout>
+    );
+  }
 
   if (!product) {
     return (
@@ -33,6 +49,7 @@ export default function ProductDetailPage() {
 
   const wishlisted = isInWishlist(product.id);
   const relatedProducts = products.filter((p) => p.category === product.category && p.id !== product.id).slice(0, 4);
+  const showPrice = !product.inquiryOnly && product.price > 0;
 
   return (
     <Layout>
@@ -42,8 +59,12 @@ export default function ProductDetailPage() {
           <Link to="/" className="hover:text-primary">Home</Link>
           <span>/</span>
           <Link to="/shop" className="hover:text-primary">Shop</Link>
-          <span>/</span>
-          <Link to={`/shop?category=${product.category}`} className="hover:text-primary capitalize">{product.category}</Link>
+          {product.category && (
+            <>
+              <span>/</span>
+              <Link to={`/shop?category=${product.category}`} className="hover:text-primary capitalize">{product.category}</Link>
+            </>
+          )}
           <span>/</span>
           <span className="text-foreground">{product.name}</span>
         </div>
@@ -79,19 +100,25 @@ export default function ProductDetailPage() {
             <p className="text-sm text-muted-foreground uppercase tracking-wide">{product.brand}</p>
             <h1 className="font-display text-3xl font-bold mt-1">{product.name}</h1>
 
-            <div className="flex items-center gap-2 mt-3">
-              <div className="flex items-center gap-1">
-                {Array.from({ length: 5 }).map((_, i) => (
-                  <Star key={i} className={cn("h-4 w-4", i < Math.floor(product.rating) ? "fill-yellow-400 text-yellow-400" : "text-muted")} />
-                ))}
+            {product.rating !== undefined && (
+              <div className="flex items-center gap-2 mt-3">
+                <div className="flex items-center gap-1">
+                  {Array.from({ length: 5 }).map((_, i) => (
+                    <Star key={i} className={cn("h-4 w-4", i < Math.floor(product.rating || 0) ? "fill-yellow-400 text-yellow-400" : "text-muted")} />
+                  ))}
+                </div>
+                <span className="text-sm font-medium">{product.rating}</span>
+                {product.reviewCount !== undefined && (
+                  <span className="text-sm text-muted-foreground">({product.reviewCount} reviews)</span>
+                )}
               </div>
-              <span className="text-sm font-medium">{product.rating}</span>
-              <span className="text-sm text-muted-foreground">({product.reviewCount} reviews)</span>
-            </div>
+            )}
 
             <div className="flex items-center gap-3 mt-4">
-              <span className="font-display text-3xl font-bold text-primary">{formatPrice(product.price)}</span>
-              {product.originalPrice && (
+              <span className="font-display text-3xl font-bold text-primary">
+                {showPrice ? formatPrice(product.price) : "Contact for price"}
+              </span>
+              {showPrice && product.originalPrice && (
                 <>
                   <span className="text-lg text-muted-foreground line-through">{formatPrice(product.originalPrice)}</span>
                   <Badge className="gradient-purple text-primary-foreground border-0">{product.discount}% OFF</Badge>
@@ -99,7 +126,7 @@ export default function ProductDetailPage() {
               )}
             </div>
 
-            <p className="text-muted-foreground mt-4">{product.description}</p>
+            {product.description && <p className="text-muted-foreground mt-4">{product.description}</p>}
 
             {/* Quantity & Add to Cart */}
             <div className="flex items-center gap-4 mt-8">
@@ -108,9 +135,9 @@ export default function ProductDetailPage() {
                 <span className="w-12 text-center font-medium">{quantity}</span>
                 <Button variant="ghost" size="icon" onClick={() => setQuantity(quantity + 1)}><Plus className="h-4 w-4" /></Button>
               </div>
-              <Button size="lg" onClick={() => addItem(product, quantity)} disabled={!product.inStock} className="flex-1">
+              <Button size="lg" onClick={() => addItem(product, quantity)} disabled={!product.inStock || product.inquiryOnly} className="flex-1">
                 <ShoppingCart className="h-4 w-4 mr-2" />
-                {product.inStock ? "Add to Cart" : "Out of Stock"}
+                {product.inquiryOnly ? "Inquiry Only" : product.inStock ? "Add to Cart" : "Out of Stock"}
               </Button>
               <Button size="lg" variant="outline" onClick={() => toggleWishlist(product.id)}>
                 <Heart className={cn("h-4 w-4", wishlisted && "fill-destructive text-destructive")} />
@@ -123,7 +150,7 @@ export default function ProductDetailPage() {
               <div className="flex items-center justify-between mt-2">
                 <div>
                   <span className="font-display font-bold text-lg text-primary">Mintpay</span>
-                  <p className="text-sm text-muted-foreground">3x {formatPrice(Math.round(product.price / 3))} / month</p>
+                  {showPrice && <p className="text-sm text-muted-foreground">3x {formatPrice(Math.round(product.price / 3))} / month</p>}
                 </div>
                 <Button variant="outline" size="sm">Learn More</Button>
               </div>
@@ -151,18 +178,22 @@ export default function ProductDetailPage() {
         <Tabs defaultValue="specs" className="mt-12">
           <TabsList className="glass">
             <TabsTrigger value="specs">Specifications</TabsTrigger>
-            <TabsTrigger value="reviews">Reviews ({product.reviewCount})</TabsTrigger>
+            <TabsTrigger value="reviews">Reviews ({product.reviewCount || 0})</TabsTrigger>
           </TabsList>
           <TabsContent value="specs" className="mt-4">
             <div className="glass rounded-xl p-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {Object.entries(product.specs).map(([key, value]) => (
-                  <div key={key} className="flex justify-between py-2 border-b border-border last:border-0">
-                    <span className="text-muted-foreground">{key}</span>
-                    <span className="font-medium">{value}</span>
-                  </div>
-                ))}
-              </div>
+              {Object.keys(product.specs || {}).length === 0 ? (
+                <p className="text-sm text-muted-foreground">No specifications available yet.</p>
+              ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {Object.entries(product.specs || {}).map(([key, value]) => (
+                    <div key={key} className="flex justify-between py-2 border-b border-border last:border-0">
+                      <span className="text-muted-foreground">{key}</span>
+                      <span className="font-medium">{value}</span>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
           </TabsContent>
           <TabsContent value="reviews" className="mt-4">
