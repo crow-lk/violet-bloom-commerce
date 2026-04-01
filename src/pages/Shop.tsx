@@ -190,7 +190,7 @@ export default function ShopPage() {
                     <p className="text-sm font-medium mb-2">Price Range</p>
                     <Slider
                       value={priceRange}
-                      onValueChange={(v) => { setPriceRange(v); setPage(1); }}
+                      onValueChange={(v) => { setPriceRange(v as [number, number]); setPage(1); }}
                       min={0}
                       max={maxPrice || 100}
                       step={500}
