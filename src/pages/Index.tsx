@@ -41,14 +41,14 @@ const resolveCategoryIcon = (key: string) => CATEGORY_ICONS[key] || <Gem classNa
 
 // Hero Slider Data
 const heroSlides = [
-  {
-    title: "Discover Amazing Deals",
-    subtitle: "Up to 33% OFF on Beauty & Care",
-    cta: "Shop Now",
-    link: "/shop?category=beauty",
-    badge: "🔥 Hot Deals",
-    image: heroDeals,
-  },
+  // {
+  //   title: "Discover Amazing Deals",
+  //   subtitle: "Up to 33% OFF on Beauty & Care",
+  //   cta: "Shop Now",
+  //   link: "/shop?category=beauty",
+  //   badge: "🔥 Hot Deals",
+  //   image: heroDeals,
+  // },
   {
     title: "Trending Jewelry",
     subtitle: "Elegant necklaces, earrings & bracelets",
@@ -219,7 +219,7 @@ export default function Index() {
       </section>
 
       {/* Flash Sale Banner */}
-      <section className="bg-gradient-to-r from-destructive/90 to-accent py-6 text-primary-foreground">
+      {/* <section className="bg-gradient-to-r from-destructive/90 to-accent py-6 text-primary-foreground">
         <div className="container mx-auto px-4 flex flex-col md:flex-row items-center justify-between gap-4">
           <div>
             <h2 className="font-display text-2xl font-bold flex items-center gap-2">
@@ -232,7 +232,7 @@ export default function Index() {
             <Link to="/shop?filter=deals">Shop Deals</Link>
           </Button>
         </div>
-      </section>
+      </section> */}
 
       {/* Categories Sidebar + Featured Content */}
       <section className="py-16">
