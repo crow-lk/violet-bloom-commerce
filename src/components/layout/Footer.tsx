@@ -61,6 +61,8 @@ export default function Footer() {
             <Link to="/privacy-policy" className="hover:text-primary-foreground transition-colors">Privacy Policy</Link>
             <span>•</span>
             <Link to="/terms-and-conditions" className="hover:text-primary-foreground transition-colors">Terms & Conditions</Link>
+            <span>•</span>
+            <Link to="/refund-policy" className="hover:text-primary-foreground transition-colors">Refund Policy</Link>
           </div>
           <p>Powered by crow.lk</p>
         </div>
