@@ -122,11 +122,11 @@ export default function CartPage() {
             </Button>
 
             {/* Mint Pay */}
-            <div className="mt-3 p-3 glass rounded-lg text-center">
+            {/* <div className="mt-3 p-3 glass rounded-lg text-center">
               <p className="text-xs text-muted-foreground">Or pay with</p>
               <p className="font-display font-bold text-primary">Mintpay</p>
               <p className="text-xs text-muted-foreground">3x {formatPrice(Math.round(total / 3))} / month</p>
-            </div>
+            </div> */}
           </div>
         </div>
       </div>

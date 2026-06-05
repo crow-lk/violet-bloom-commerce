@@ -1,12 +1,11 @@
 import { useState, useEffect } from "react";
-import { useParams, Link } from "react-router-dom";
-import { ChevronLeft, Star, ShoppingCart, Heart, Minus, Plus, Truck, Shield, RotateCcw } from "lucide-react";
+import { useParams, Link, useNavigate } from "react-router-dom";
+import { ChevronLeft, ChevronRight, Star, ShoppingCart, Heart, Minus, Plus, Truck, Shield, RotateCcw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import Layout from "@/components/layout/Layout";
 import ProductCard from "@/components/products/ProductCard";
-import PaymentMethods from "@/components/products/PaymentMethods";
 import { formatPrice } from "@/lib/format";
 import { useCart } from "@/contexts/CartContext";
 import { useWishlist } from "@/contexts/WishlistContext";
@@ -16,12 +15,14 @@ import { useCatalog } from "@/hooks/useCatalog";
 
 export default function ProductDetailPage() {
   const { slug } = useParams();
+  const navigate = useNavigate();
   const { products, isLoading } = useCatalog();
   const product = products.find((p) => p.slug === slug);
   const { addItem } = useCart();
   const { toggleWishlist, isInWishlist } = useWishlist();
   const [selectedImage, setSelectedImage] = useState(0);
   const [quantity, setQuantity] = useState(1);
+  const [carouselIdx, setCarouselIdx] = useState(0);
 
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "instant" });
@@ -49,7 +50,7 @@ export default function ProductDetailPage() {
   }
 
   const wishlisted = isInWishlist(product.id);
-  const relatedProducts = products.filter((p) => p.category === product.category && p.id !== product.id).slice(0, 4);
+  const relatedProducts = products.filter((p) => p.category === product.category && p.id !== product.id);
   const showPrice = !product.inquiryOnly && product.price > 0;
 
   return (
@@ -129,27 +130,36 @@ export default function ProductDetailPage() {
 
             {product.description && <p className="text-muted-foreground mt-4">{product.description}</p>}
 
-            {/* Quantity & Add to Cart */}
+            {/* Quantity */}
             <div className="flex items-center gap-4 mt-8">
               <div className="flex items-center glass rounded-lg">
                 <Button variant="ghost" size="icon" onClick={() => setQuantity(Math.max(1, quantity - 1))}><Minus className="h-4 w-4" /></Button>
                 <span className="w-12 text-center font-medium">{quantity}</span>
                 <Button variant="ghost" size="icon" onClick={() => setQuantity(quantity + 1)}><Plus className="h-4 w-4" /></Button>
               </div>
-              <Button size="lg" onClick={() => addItem(product, quantity)} disabled={!product.inStock || product.inquiryOnly} className="flex-1">
-                <ShoppingCart className="h-4 w-4 mr-2" />
-                {product.inquiryOnly ? "Inquiry Only" : product.inStock ? "Add to Cart" : "Out of Stock"}
-              </Button>
-              <Button size="lg" variant="outline" onClick={() => toggleWishlist(product.id)}>
-                <Heart className={cn("h-4 w-4", wishlisted && "fill-destructive text-destructive")} />
+            </div>
+
+            {/* Add to Cart & Buy Now */}
+            <div className="flex flex-col gap-3 mt-2">
+              <div className="flex items-center gap-6 mt-8">
+                <Button size="lg" onClick={() => addItem(product, quantity)} disabled={!product.inStock || product.inquiryOnly} className="w-1/2">
+                  <ShoppingCart className="h-4 w-4 mr-2" />
+                  {product.inquiryOnly ? "Inquiry Only" : product.inStock ? "Add to Cart" : "Out of Stock"}
+                </Button>
+                <Button size="lg" variant="outline" onClick={() => toggleWishlist(product.id)} >
+                  <Heart className={cn("h-4 w-4", wishlisted && "fill-destructive text-destructive")} />
+                </Button>
+              </div>  
+              <Button size="lg" onClick={() => { navigate("/checkout"); }} disabled={!product.inStock || product.inquiryOnly} className="w-2/3 bg-white border border-purple-600 text-purple-700 hover:bg-purple-50">
+                Buy Now
               </Button>
             </div>
 
             {/* Payment Methods */}
-            <PaymentMethods />
+            {/* <PaymentMethods /> */}
 
             {/* Trust badges */}
-            <div className="grid grid-cols-3 gap-4 mt-6">
+            {/* <div className="grid grid-cols-3 gap-4 mt-6">
               <div className="flex flex-col items-center text-center gap-1">
                 <Truck className="h-5 w-5 text-primary" />
                 <span className="text-xs text-muted-foreground">Free Shipping</span>
@@ -162,7 +172,7 @@ export default function ProductDetailPage() {
                 <RotateCcw className="h-5 w-5 text-primary" />
                 <span className="text-xs text-muted-foreground">7 Day Returns</span>
               </div>
-            </div>
+            </div> */}
           </div>
         </div>
 
@@ -198,9 +208,19 @@ export default function ProductDetailPage() {
         {/* Related */}
         {relatedProducts.length > 0 && (
           <section className="mt-16">
-            <h2 className="font-display text-2xl font-bold mb-6">Related Products</h2>
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="font-display text-2xl font-bold">Related Products</h2>
+              <div className="flex gap-2">
+                <Button size="icon" variant="outline" onClick={() => setCarouselIdx(Math.max(0, carouselIdx - 1))} disabled={carouselIdx === 0}>
+                  <ChevronLeft className="h-4 w-4" />
+                </Button>
+                <Button size="icon" variant="outline" onClick={() => setCarouselIdx(Math.min(relatedProducts.length - 4, carouselIdx + 1))} disabled={carouselIdx >= relatedProducts.length - 4}>
+                  <ChevronRight className="h-4 w-4" />
+                </Button>
+              </div>
+            </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-              {relatedProducts.map((p) => (
+              {relatedProducts.slice(carouselIdx, carouselIdx + 4).map((p) => (
                 <ProductCard key={p.id} product={p} />
               ))}
             </div>

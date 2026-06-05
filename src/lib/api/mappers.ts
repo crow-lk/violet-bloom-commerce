@@ -42,9 +42,6 @@ export function mapProduct(
   if (product.material_composition) specs["Material"] = product.material_composition;
   if (product.care_instructions) specs["Care"] = product.care_instructions;
   if (product.season) specs["Season"] = product.season;
-  if (product.hs_code) specs["HS Code"] = product.hs_code;
-  if (product.sku_prefix) specs["SKU Prefix"] = product.sku_prefix;
-  if (variant?.sku) specs["SKU"] = variant.sku;
   if (variant?.size_name) specs["Size"] = variant.size_name;
   if (variant?.color?.name) specs["Color"] = variant.color.name;
 
