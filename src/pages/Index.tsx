@@ -5,6 +5,7 @@ import heroDeals from "@/assets/hero-deals.jpg";
 import heroTrending from "@/assets/hero-trending.jpg";
 import heroHome from "@/assets/hero-home.jpg";
 import heroKids from "@/assets/hero-kids.jpg";
+import cod from "@/assets/cod.png";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -374,7 +375,7 @@ export default function Index() {
       </section>
 
       {/* Hot Deals */}
-      <section className="py-16">
+      {/* <section className="py-16">
         <div className="container mx-auto px-4">
           <h2 className="font-display text-3xl font-bold text-center mb-2 flex items-center justify-center gap-2">
             <Flame className="h-7 w-7 text-destructive" /> Hot Deals
@@ -399,6 +400,27 @@ export default function Index() {
             </Button>
           </div>
         </div>
+      </section> */}
+
+      {/* Chuttak Pay Membership */}
+      <section className="py-16 bg-primary/5">
+        <div className="container mx-auto px-4 text-center">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+          >
+            <h2 className="font-display text-3xl font-bold mb-4">ChuttakPay Membership</h2>
+            <p className="text-muted-foreground max-w-2xl mx-auto mb-8">
+              Join our exclusive membership program to unlock special discounts, early access to new products,
+              and enjoy seamless checkout with Chuttak Pay. Get 10% off your first purchase and earn points
+              on every order.
+            </p>
+            <Button asChild size="lg" className="gradient-purple text-primary-foreground">
+              <Link to="/membership">Learn More <ArrowRight className="ml-2 h-4 w-4" /></Link>
+            </Button>
+          </motion.div>
+        </div>
       </section>
 
       {/* Promo Banners */}
@@ -412,8 +434,8 @@ export default function Index() {
               className="gradient-purple rounded-2xl p-8 text-primary-foreground"
             >
               <Badge className="bg-primary-foreground/20 border-0 text-primary-foreground mb-4">Limited Offer</Badge>
-              <h3 className="font-display text-2xl font-bold">Free Shipping Weekend</h3>
-              <p className="mt-2 opacity-80">Free delivery on all orders this weekend only.</p>
+              <h3 className="font-display text-2xl font-bold">Free Shipping Month End Sunday</h3>
+              <p className="mt-2 opacity-80">Free delivery on all orders this month end sunday only.</p>
               <Button asChild className="mt-4 bg-primary-foreground text-primary hover:bg-primary-foreground/90">
                 <Link to="/shop">Shop Now</Link>
               </Button>
@@ -424,11 +446,21 @@ export default function Index() {
               viewport={{ once: true }}
               className="bg-foreground rounded-2xl p-8 text-background"
             >
-              <Badge className="bg-primary border-0 text-primary-foreground mb-4">Mintpay</Badge>
-              <h3 className="font-display text-2xl font-bold">Buy Now, Pay Later</h3>
-              <p className="mt-2 opacity-80">Split your purchase into 3 easy payments with Mintpay. 0% interest.</p>
+              <div className="flex items-center gap-4 mb-4">
+                <a href="" target="_blank">
+                  <img src="https://www.payhere.lk/downloads/images/payhere_short_banner_dark.png" alt="PayHere" width="250" />
+                </a>
+                <img
+                  src={cod}
+                  alt="Cash on Delivery"
+                  width="90"
+                  height="90"
+                  className="[filter:hue-rotate(265deg)_saturate(3)_brightness(0.9)]"
+                />
+              </div>
+              <h3 className="font-display text-2xl font-bold text-left">Pay Your Way</h3>
               <Button asChild className="mt-4" variant="secondary">
-                <Link to="/shop">Shop with Mintpay</Link>
+                <Link to="/shop">Shop Now</Link>
               </Button>
             </motion.div>
           </div>
@@ -446,7 +478,7 @@ export default function Index() {
           >
             <Mail className="h-10 w-10 mx-auto text-primary mb-4" />
             <h2 className="font-display text-2xl font-bold">Stay Updated</h2>
-            <p className="text-muted-foreground mt-2">Subscribe to get exclusive deals and new arrival alerts.</p>
+            <p className="text-muted-foreground mt-2">Get our honest product reviews every week, with useful insights, recommendations, and new product highlights.</p>
             <form className="flex gap-2 mt-6 max-w-md mx-auto" onSubmit={(e) => e.preventDefault()}>
               <Input placeholder="Enter your email" type="email" className="flex-1" />
               <Button type="submit">Subscribe</Button>

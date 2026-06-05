@@ -28,8 +28,8 @@ export default function ContactPage() {
   };
 
   const contactInfo = [
-    { icon: <Mail className="h-5 w-5" />, title: "Email", value: "support@chuttakpay.lk", link: "mailto:support@chuttakpay.lk" },
-    { icon: <Phone className="h-5 w-5" />, title: "Phone", value: "+94 77 123 4567", link: "tel:+94771234567" },
+    { icon: <Mail className="h-5 w-5" />, title: "Email", value: "support@chuttakpay.com", link: "mailto:support@chuttakpay.com" },
+    { icon: <Phone className="h-5 w-5" />, title: "Phone", value: "075 922 4225", link: "tel:075 922 4225" },
     { icon: <MapPin className="h-5 w-5" />, title: "Address", value: "No. 62, Goods Shed Road, Ratnapura 70000", link: null },
     { icon: <Clock className="h-5 w-5" />, title: "Hours", value: "Mon - Sat: 9AM - 6PM", link: null },
   ];
@@ -163,7 +163,7 @@ export default function ContactPage() {
                       value={formData.phone}
                       onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
                       className="mt-1"
-                      placeholder="+94 77 123 4567"
+                      placeholder="0759224225"
                     />
                   </div>
                   <div>

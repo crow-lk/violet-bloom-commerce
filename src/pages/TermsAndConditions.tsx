@@ -65,7 +65,7 @@ export default function TermsAndConditions() {
 
           <section>
             <h2 className="font-display text-xl font-semibold text-foreground">Contact Us</h2>
-            <p>If you have any questions or concerns regarding these Terms & Conditions, please contact our customer support team at <a href="mailto:support@chuttakpay.lk" className="text-primary hover:underline">support@chuttakpay.lk</a>.</p>
+            <p>If you have any questions or concerns regarding these Terms & Conditions, please contact our customer support team at <a href="mailto:support@chuttakpay.com" className="text-primary hover:underline">support@chuttakpay.com</a>.</p>
           </section>
         </div>
       </div>
