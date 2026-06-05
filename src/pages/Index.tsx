@@ -357,7 +357,7 @@ export default function Index() {
               <TrendingUp className="h-7 w-7 text-primary" />
               <div>
                 <h2 className="font-display text-3xl font-bold">Trending Now</h2>
-                <p className="text-muted-foreground mt-1">Random picks updated daily</p>
+                <p className="text-muted-foreground mt-1">Most Popular Products</p>
               </div>
             </div>
             <div className="flex gap-2">
