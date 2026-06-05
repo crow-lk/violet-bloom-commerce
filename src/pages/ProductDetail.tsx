@@ -73,27 +73,56 @@ export default function ProductDetailPage() {
 
         <div className="grid md:grid-cols-2 gap-8 lg:gap-12">
           {/* Images */}
-          <div>
+          <div className="relative">
             <motion.div
               key={selectedImage}
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               className="aspect-square rounded-2xl overflow-hidden glass"
+              onDragEnd={(e, info) => {
+                if (info.offset.x > 100) {
+                  setSelectedImage((prev) => Math.max(0, prev - 1));
+                } else if (info.offset.x < -100) {
+                  setSelectedImage((prev) => Math.min(product.images.length - 1, prev + 1));
+                }
+              }}
+              drag="x"
+              dragConstraints={{ left: 0, right: 0 }}
             >
               <img src={product.images[selectedImage]} alt={product.name} className="w-full h-full object-cover" />
             </motion.div>
             {product.images.length > 1 && (
-              <div className="flex gap-2 mt-4">
-                {product.images.map((img, i) => (
-                  <button
-                    key={i}
-                    onClick={() => setSelectedImage(i)}
-                    className={cn("w-20 h-20 rounded-lg overflow-hidden border-2 transition-colors", i === selectedImage ? "border-primary" : "border-transparent")}
-                  >
-                    <img src={img} alt="" className="w-full h-full object-cover" />
-                  </button>
-                ))}
-              </div>
+              <>
+                <Button
+                  size="icon"
+                  variant="ghost"
+                  className="absolute left-2 top-[45%] -translate-y-[45%] h-12 w-12 rounded-full bg-black/20 hover:bg-black/40 backdrop-blur-sm"
+                  onClick={() => setSelectedImage((prev) => Math.max(0, prev - 1))}
+                  disabled={selectedImage === 0}
+                >
+                  <ChevronLeft className="h-8 w-8 text-white" />
+                </Button>
+                <Button
+                  size="icon"
+                  variant="ghost"
+                  className="absolute right-2 top-[45%] -translate-y-[45%] h-12 w-12 rounded-full bg-black/20 hover:bg-black/40 backdrop-blur-sm"
+                  onClick={() => setSelectedImage((prev) => Math.min(product.images.length - 1, prev + 1))}
+                  disabled={selectedImage === product.images.length - 1}
+                >
+                  <ChevronRight className="h-8 w-8 text-white" />
+                </Button>
+                <div className="flex gap-2 mt-4">
+                  {product.images.map((img, i) => (
+                    <button
+                      key={i}
+                      onClick={() => setSelectedImage(i)}
+                      className={cn("w-20 h-20 rounded-lg overflow-hidden border-2 transition-colors", i === selectedImage ? "border-primary" : "border-transparent")}
+                    >
+                      <img src={img} alt="" className="w-full h-full object-cover" />
+                    </button>
+                  ))}
+                </div>
+              </>
             )}
           </div>
 
@@ -177,24 +206,17 @@ export default function ProductDetailPage() {
         </div>
 
         {/* Tabs */}
-        <Tabs defaultValue="specs" className="mt-12">
+        <Tabs defaultValue="description" className="mt-12">
           <TabsList className="glass">
-            <TabsTrigger value="specs">Specifications</TabsTrigger>
+            <TabsTrigger value="description">Description</TabsTrigger>
             <TabsTrigger value="reviews">Reviews ({product.reviewCount || 0})</TabsTrigger>
           </TabsList>
-          <TabsContent value="specs" className="mt-4">
+          <TabsContent value="description" className="mt-4">
             <div className="glass rounded-xl p-6">
-              {Object.keys(product.specs || {}).length === 0 ? (
-                <p className="text-sm text-muted-foreground">No specifications available yet.</p>
+              {product.description ? (
+                <p className="text-muted-foreground whitespace-pre-line">{product.description}</p>
               ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {Object.entries(product.specs || {}).map(([key, value]) => (
-                    <div key={key} className="flex justify-between py-2 border-b border-border last:border-0">
-                      <span className="text-muted-foreground">{key}</span>
-                      <span className="font-medium">{value}</span>
-                    </div>
-                  ))}
-                </div>
+                <p className="text-sm text-muted-foreground">No description available yet.</p>
               )}
             </div>
           </TabsContent>
