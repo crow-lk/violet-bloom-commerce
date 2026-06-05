@@ -21,8 +21,7 @@ export default function RefundPolicy() {
 
           <section>
             <h2 className="font-display text-xl font-semibold text-foreground">Exchanges</h2>
-            <p>If you would like to exchange your item for a different size, color, or style, please contact our customer support team within 7 days of receiving your order. We will provide you with further instructions on how to proceed with the exchange.</p>
-            <p>Shipping cost should be provided by the customer.</p>
+            <p>If you would like to exchange your item for a different size, color, or style, please contact our customer support team within 7 days of receiving your order. We will provide you with further instructions on how to proceed with the exchange. Shipping cost should be provided by the customer.</p>
           </section>
 
           <section>

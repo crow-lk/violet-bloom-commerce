@@ -105,6 +105,7 @@ export interface ApiPaymentMethod {
   gateway?: string | null;
   description?: string | null;
   icon_path?: string | null;
+  icon_url?: string | null;
   instructions?: string | null;
   sort_order?: number | null;
   settings?: Record<string, unknown> | null;
