@@ -16,28 +16,31 @@ export default function RefundPolicy() {
           <section>
             <h2 className="font-display text-xl font-semibold text-foreground">Refunds</h2>
             <p>Once we receive your return and inspect the item, we will notify you of the status of your refund. If your return is approved, we will initiate a refund to your original method of payment. Please note that the refund amount will exclude any shipping charges incurred during the initial purchase.</p>
+            <p>When the customer returns, if the stock is over we will refund without shipping charges.</p>
           </section>
 
           <section>
             <h2 className="font-display text-xl font-semibold text-foreground">Exchanges</h2>
             <p>If you would like to exchange your item for a different size, color, or style, please contact our customer support team within 7 days of receiving your order. We will provide you with further instructions on how to proceed with the exchange.</p>
+            <p>Shipping cost should be provided by the customer.</p>
           </section>
 
           <section>
             <h2 className="font-display text-xl font-semibold text-foreground">Non-Returnable Items</h2>
             <p>Certain items are non-returnable and non-refundable. These include:</p>
             <ul className="list-disc pl-6 space-y-2">
-              <li>Gift cards</li>
-              <li>Downloadable software products</li>
+              <li>Toy items</li>
+              <li>Ceramics</li>
+              <li>Glasses</li>
+              <li>Plastic containers</li>
               <li>Personalized or custom-made items</li>
-              <li>Perishable goods</li>
               <li>Damaged or Defective Items</li>
             </ul>
           </section>
 
           <section>
             <h2 className="font-display text-xl font-semibold text-foreground">Damaged or Defective Items</h2>
-            <p>In the unfortunate event that your item arrives damaged or defective, please contact us immediately. We will arrange for a replacement or issue a refund, depending on your preference and product availability.</p>
+            <p>In the unfortunate event that your item arrives damaged or defective, please contact us within 24 hours. We will arrange for a replacement or issue a refund, depending on your preference and product availability.</p>
           </section>
 
           <section>
@@ -47,12 +50,17 @@ export default function RefundPolicy() {
 
           <section>
             <h2 className="font-display text-xl font-semibold text-foreground">Processing Time</h2>
-            <p>Refunds and exchanges will be processed within 7 business days after we receive your returned item. Please note that it may take additional time for the refund to appear in your account, depending on your payment provider.</p>
+            <p>Refunds will be processed within 2-3 business days after we receive your returned item. Exchanges will be processed within 7 business days. Please note that it may take additional time for the refund to appear in your account, depending on your payment provider.</p>
           </section>
 
           <section>
             <h2 className="font-display text-xl font-semibold text-foreground">Contact Us</h2>
             <p>If you have any questions or concerns regarding our refund policy, please contact our customer support team. We are here to assist you and ensure your shopping experience with us is enjoyable and hassle-free.</p>
+            <p>
+              <a href="https://wa.me/94759224225" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">
+                Chat with us on WhatsApp
+              </a>
+            </p>
           </section>
         </div>
       </div>

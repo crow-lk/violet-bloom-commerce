@@ -18,6 +18,7 @@ import Contact from "./pages/Contact";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 import TermsAndConditions from "./pages/TermsAndConditions";
 import RefundPolicy from "./pages/RefundPolicy";
+import OrderTracking from "./pages/OrderTracking";
 import NotFound from "./pages/NotFound";
 
 const ScrollToTop = () => {
@@ -54,6 +55,7 @@ const App = () => (
                 <Route path="/privacy-policy" element={<PrivacyPolicy />} />
                 <Route path="/terms-and-conditions" element={<TermsAndConditions />} />
                 <Route path="/refund-policy" element={<RefundPolicy />} />
+                <Route path="/order-tracking" element={<OrderTracking />} />
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </BrowserRouter>

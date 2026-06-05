@@ -4,6 +4,7 @@ import { User, Package, Heart, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import Layout from "@/components/layout/Layout";
 import ProductCard from "@/components/products/ProductCard";
@@ -19,6 +20,8 @@ export default function AccountPage() {
   const { toast } = useToast();
   const [isSignUp, setIsSignUp] = useState(false);
   const [authForm, setAuthForm] = useState({ name: "", email: "", mobile: "", password: "", confirmPassword: "" });
+  const [agreedToTerms, setAgreedToTerms] = useState(false);
+  const [agreedToRefund, setAgreedToRefund] = useState(false);
   const [profileForm, setProfileForm] = useState({ name: "", email: "", mobile: "" });
 
   useEffect(() => {
@@ -33,6 +36,10 @@ export default function AccountPage() {
     e.preventDefault();
     if (isSignUp && authForm.password !== authForm.confirmPassword) {
       toast({ title: "Passwords do not match", variant: "destructive" });
+      return;
+    }
+    if (isSignUp && (!agreedToTerms || !agreedToRefund)) {
+      toast({ title: "Acceptance required", description: "Please accept both Terms & Conditions and Refund Policy to create an account.", variant: "destructive" });
       return;
     }
     const success = isSignUp
@@ -103,6 +110,22 @@ export default function AccountPage() {
                 <div>
                   <Label>Confirm Password</Label>
                   <Input type="password" required className="mt-1" placeholder="••••••••" value={authForm.confirmPassword} onChange={(e) => setAuthForm({ ...authForm, confirmPassword: e.target.value })} />
+                </div>
+              )}
+              {isSignUp && (
+                <div className="space-y-3">
+                  <div className="flex items-start gap-3">
+                    <Checkbox id="terms" checked={agreedToTerms} onCheckedChange={(checked) => setAgreedToTerms(checked === true)} />
+                    <Label htmlFor="terms" className="text-sm font-normal leading-snug cursor-pointer">
+                      I agree to the <Link to="/terms-and-conditions" className="text-primary hover:underline">Terms & Conditions</Link>
+                    </Label>
+                  </div>
+                  <div className="flex items-start gap-3">
+                    <Checkbox id="refund" checked={agreedToRefund} onCheckedChange={(checked) => setAgreedToRefund(checked === true)} />
+                    <Label htmlFor="refund" className="text-sm font-normal leading-snug cursor-pointer">
+                      I agree to the <Link to="/refund-policy" className="text-primary hover:underline">Refund Policy</Link>
+                    </Label>
+                  </div>
                 </div>
               )}
               <Button type="submit" className="w-full" size="lg" disabled={isLoading}>
