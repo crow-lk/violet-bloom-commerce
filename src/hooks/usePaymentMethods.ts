@@ -9,7 +9,7 @@ export function usePaymentMethods() {
   });
 
   return {
-    methods: query.data || [],
+    methods: (query.data || []).filter((m) => m.active),
     isLoading: query.isLoading,
     isError: query.isError,
     error: query.error,

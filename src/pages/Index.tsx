@@ -108,10 +108,20 @@ function CountdownTimer() {
   );
 }
 
+const getRandomProductsByDay = (items: typeof products, count: number) => {
+  const daySeed = new Date().getDate() + new Date().getMonth() * 31 + new Date().getFullYear() * 365;
+  const seededRandom = (seed: number) => {
+    const x = Math.sin(seed) * 10000;
+    return x - Math.floor(x);
+  };
+  const shuffled = [...items].sort(() => seededRandom(daySeed) - 0.5);
+  return shuffled.slice(0, count);
+};
+
 export default function Index() {
   const { products, categories } = useCatalog();
   const featured = products.filter((p) => p.isFeatured).slice(0, 6);
-  const trending = products.filter((p) => p.isTrending).slice(0, 8);
+  const trending = getRandomProductsByDay(products, 8);
   const deals = products
     .filter((p) => (p.discount || 0) > 0)
     .sort((a, b) => (b.discount || 0) - (a.discount || 0))
@@ -347,7 +357,7 @@ export default function Index() {
               <TrendingUp className="h-7 w-7 text-primary" />
               <div>
                 <h2 className="font-display text-3xl font-bold">Trending Now</h2>
-                <p className="text-muted-foreground mt-1">Most popular products this week</p>
+                <p className="text-muted-foreground mt-1">Random picks updated daily</p>
               </div>
             </div>
             <div className="flex gap-2">

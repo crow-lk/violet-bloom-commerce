@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import Layout from "@/components/layout/Layout";
 import ProductCard from "@/components/products/ProductCard";
+import PaymentMethods from "@/components/products/PaymentMethods";
 import { formatPrice } from "@/lib/format";
 import { useCart } from "@/contexts/CartContext";
 import { useWishlist } from "@/contexts/WishlistContext";
@@ -144,17 +145,8 @@ export default function ProductDetailPage() {
               </Button>
             </div>
 
-            {/* Mint Pay */}
-            <div className="glass rounded-xl p-4 mt-4">
-              <p className="font-medium text-sm">Or pay in 3 interest-free installments with</p>
-              <div className="flex items-center justify-between mt-2">
-                <div>
-                  <span className="font-display font-bold text-lg text-primary">Mintpay</span>
-                  {showPrice && <p className="text-sm text-muted-foreground">3x {formatPrice(Math.round(product.price / 3))} / month</p>}
-                </div>
-                <Button variant="outline" size="sm">Learn More</Button>
-              </div>
-            </div>
+            {/* Payment Methods */}
+            <PaymentMethods />
 
             {/* Trust badges */}
             <div className="grid grid-cols-3 gap-4 mt-6">
