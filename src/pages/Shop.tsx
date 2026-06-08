@@ -96,7 +96,7 @@ export default function ShopPage() {
 
   return (
     <Layout>
-      <div className="container mx-auto px-4 py-8">
+      <div className="container mx-auto px-2 md:px-4 py-8">
         {/* Header */}
         <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 mb-8">
           <div>
@@ -207,7 +207,7 @@ export default function ShopPage() {
           </AnimatePresence>
 
           {/* Products */}
-          <div className="flex-1 container mx-auto">
+          <div className="flex-1 mx-auto">
             {/* Active filters */}
             {activeFilterCount > 0 && (
               <div className="flex flex-wrap gap-2 mb-4">
@@ -222,7 +222,7 @@ export default function ShopPage() {
               </div>
             )}
 
-            <div className={view === "grid" ? "grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-4" : "flex flex-col gap-4"}>
+            <div className={view === "grid" ? "grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-2" : "flex flex-col gap-4"}>
               {paginated.map((p) => (
                 <ProductCard key={p.id} product={p} view={view} />
               ))}
