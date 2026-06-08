@@ -26,7 +26,9 @@ export function useCatalog() {
   const brands = fallbackArray(brandsQuery.data);
 
   const products = useMemo(() => {
-    return fallbackArray(productsQuery.data).map((product) => mapProduct(product, categories, brands));
+    return fallbackArray(productsQuery.data)
+      .filter((product) => product.status === "active")
+      .map((product) => mapProduct(product, categories, brands));
   }, [productsQuery.data, categories, brands]);
 
   return {
