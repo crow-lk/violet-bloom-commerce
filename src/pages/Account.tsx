@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { User, Package, Heart, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -17,6 +17,8 @@ export default function AccountPage() {
   const { wishlist } = useWishlist();
   const { products } = useCatalog();
   const { user, isLoading, login, register, logout, updateProfile } = useAuth();
+  const navigate = useNavigate();
+  const location = useLocation();
   const { toast } = useToast();
   const [isSignUp, setIsSignUp] = useState(false);
   const [authForm, setAuthForm] = useState({ name: "", email: "", mobile: "", password: "", confirmPassword: "" });
@@ -46,10 +48,12 @@ export default function AccountPage() {
       ? await register({ name: authForm.name, email: authForm.email, mobile: authForm.mobile, password: authForm.password })
       : await login(authForm.email, authForm.password);
 
-    if (!success) {
-      toast({ title: "Authentication failed", description: "Please check your details and try again.", variant: "destructive" });
-    } else {
+    if (success) {
       setAuthForm({ name: "", email: "", mobile: "", password: "", confirmPassword: "" });
+      const redirectTo = (location.state as { from?: string } | null)?.from || "/account";
+      navigate(redirectTo, { replace: true });
+    } else {
+      toast({ title: "Authentication failed", description: "Please check your details and try again.", variant: "destructive" });
     }
   };
 
