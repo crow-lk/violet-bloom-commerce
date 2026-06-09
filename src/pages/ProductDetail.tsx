@@ -191,7 +191,7 @@ export default function ProductDetailPage() {
                   <Heart className={cn("h-4 w-4", wishlisted && "fill-destructive text-destructive")} />
                 </Button>
               </div>  
-              <Button size="lg" onClick={() => { navigate("/checkout"); }} disabled={!product.inStock || product.inquiryOnly} className="w-full sm:w-auto h-11 bg-white border border-purple-600 text-purple-700 hover:bg-purple-50">
+              <Button size="lg" onClick={async () => { await addItem(product, quantity); navigate("/checkout"); }} disabled={!product.inStock || product.inquiryOnly} className="w-full sm:w-auto h-11 bg-white border border-purple-600 text-purple-700 hover:bg-purple-50">
                 Buy Now
               </Button>
             </div>
