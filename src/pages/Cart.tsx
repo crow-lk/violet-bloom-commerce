@@ -3,12 +3,28 @@ import { Trash2, Minus, Plus, ShoppingBag, Tag, ArrowRight } from "lucide-react"
 import { Button } from "@/components/ui/button";
 import Layout from "@/components/layout/Layout";
 import { useCart } from "@/contexts/CartContext";
+import { useAuth } from "@/contexts/AuthContext";
 import { formatPrice } from "@/lib/format";
 import { motion, AnimatePresence } from "framer-motion";
+import { useToast } from "@/hooks/use-toast";
 
 export default function CartPage() {
   const { items, removeItem, updateQuantity, subtotal, taxTotal, discountTotal, total, itemCount, isLoading } = useCart();
+  const { user } = useAuth();
   const navigate = useNavigate();
+  const { toast } = useToast();
+
+  const handleCheckout = () => {
+    if (!user) {
+      toast({
+        title: "Login Required",
+        description: "Please log in to proceed to checkout.",
+      });
+      navigate("/account", { state: { from: "/checkout" } });
+    } else {
+      navigate("/checkout");
+    }
+  };
 
   if (isLoading && items.length === 0) {
     return (
@@ -117,9 +133,9 @@ export default function CartPage() {
               Discounts and taxes are calculated at checkout.
             </div>
 
-            <Button className="w-full mt-6" size="lg" onClick={() => navigate("/checkout")}>
-              Proceed to Checkout <ArrowRight className="ml-2 h-4 w-4" />
-            </Button>
+<Button className="w-full mt-6" size="lg" onClick={handleCheckout}>
+               Proceed to Checkout <ArrowRight className="ml-2 h-4 w-4" />
+             </Button>
 
             {/* Mint Pay */}
             {/* <div className="mt-3 p-3 glass rounded-lg text-center">

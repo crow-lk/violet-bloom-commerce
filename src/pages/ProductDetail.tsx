@@ -8,10 +8,12 @@ import Layout from "@/components/layout/Layout";
 import ProductCard from "@/components/products/ProductCard";
 import { formatPrice } from "@/lib/format";
 import { useCart } from "@/contexts/CartContext";
+import { useAuth } from "@/contexts/AuthContext";
 import { useWishlist } from "@/contexts/WishlistContext";
 import { cn } from "@/lib/utils";
 import { motion, AnimatePresence } from "framer-motion";
 import { useCatalog } from "@/hooks/useCatalog";
+import { useToast } from "@/hooks/use-toast";
 
 export default function ProductDetailPage() {
   const { slug } = useParams();
@@ -19,11 +21,26 @@ export default function ProductDetailPage() {
   const { products, isLoading } = useCatalog();
   const product = products.find((p) => p.slug === slug);
   const { addItem } = useCart();
+  const { user } = useAuth();
   const { toggleWishlist, isInWishlist } = useWishlist();
+  const { toast } = useToast();
   const [selectedImage, setSelectedImage] = useState(0);
   const [quantity, setQuantity] = useState(1);
   const [carouselIdx, setCarouselIdx] = useState(0);
   const [imageDirection, setImageDirection] = useState(1);
+
+  const handleBuyNow = async () => {
+    await addItem(product, quantity);
+    if (!user) {
+      toast({
+        title: "Login Required",
+        description: "Please log in to proceed to checkout.",
+      });
+      navigate("/account", { state: { from: "/checkout" } });
+    } else {
+      navigate("/checkout");
+    }
+  };
 
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "instant" });
@@ -191,10 +208,10 @@ export default function ProductDetailPage() {
                   <Heart className={cn("h-4 w-4", wishlisted && "fill-destructive text-destructive")} />
                 </Button>
               </div>  
-              <Button size="lg" onClick={async () => { await addItem(product, quantity); navigate("/checkout"); }} disabled={!product.inStock || product.inquiryOnly} className="w-full sm:w-auto h-11 bg-white border border-purple-600 text-purple-700 hover:bg-purple-50">
-                Buy Now
-              </Button>
-            </div>
+<Button size="lg" onClick={handleBuyNow} disabled={!product.inStock || product.inquiryOnly} className="w-full sm:w-auto h-11 bg-white border border-purple-600 text-purple-700 hover:bg-purple-50">
+                 Buy Now
+               </Button>
+             </div>
 
             {/* Payment Methods */}
             {/* <PaymentMethods /> */}
