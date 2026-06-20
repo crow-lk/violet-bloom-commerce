@@ -4,6 +4,7 @@ import {
   ApiBrand,
   ApiCart,
   ApiCategory,
+  ApiCheckoutRedirect,
   ApiOrder,
   ApiPaymentMethod,
   ApiProduct,
@@ -54,7 +55,7 @@ export const mergeCart = (payload: { session_id: string }) =>
   apiFetch<{ message: string; cart: ApiCart }>("/cart/merge", { method: "POST", json: payload });
 
 export const createPayment = (payload: Record<string, unknown>) =>
-  apiFetch<{ message: string; payment: { id: number }; checkout?: unknown }>("/checkout/payments", {
+  apiFetch<{ message: string; payment: { id: number }; checkout?: ApiCheckoutRedirect }>("/checkout/payments", {
     method: "POST",
     json: payload,
   });

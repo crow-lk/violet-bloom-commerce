@@ -97,6 +97,12 @@ export interface ApiCart {
   items: ApiCartItem[];
 }
 
+export interface ApiCheckoutRedirect {
+  type: "redirect";
+  action_url: string;
+  fields: Record<string, string>;
+}
+
 export interface ApiPaymentMethod {
   id: number;
   name: string;
