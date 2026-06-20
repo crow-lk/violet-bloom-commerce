@@ -14,6 +14,7 @@ import { createPayment, placeOrder } from "@/lib/api";
 import { useAuth } from "@/contexts/AuthContext";
 import { ensureCartSessionId } from "@/lib/cartSession";
 import { useToast } from "@/hooks/use-toast";
+import { ApiCheckoutRedirect } from "@/lib/api/types";
 
 export default function CheckoutPage() {
   const { items, subtotal, taxTotal, discountTotal, total, clearCart } = useCart();
@@ -23,6 +24,7 @@ export default function CheckoutPage() {
   const [orderPlaced, setOrderPlaced] = useState(false);
   const [orderId, setOrderId] = useState<string | null>(null);
   const [isPlacing, setIsPlacing] = useState(false);
+  const [isRedirecting, setIsRedirecting] = useState(false);
   const navigate = useNavigate();
 
   const [formData, setFormData] = useState({
@@ -61,6 +63,26 @@ export default function CheckoutPage() {
 
   const selectedMethod = activeMethods.find((m) => String(m.id) === paymentMethodId);
 
+  const redirectToGateway = (checkout: ApiCheckoutRedirect) => {
+    if (checkout.type !== "redirect" || !checkout.action_url) {
+      return;
+    }
+    const form = document.createElement("form");
+    form.method = "POST";
+    form.action = checkout.action_url;
+    
+    Object.entries(checkout.fields).forEach(([key, value]) => {
+      const input = document.createElement("input");
+      input.type = "hidden";
+      input.name = key;
+      input.value = String(value);
+      form.appendChild(input);
+    });
+    
+    document.body.appendChild(form);
+    form.submit();
+  };
+
   const handlePlaceOrder = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!paymentMethodId) {
@@ -70,19 +92,7 @@ export default function CheckoutPage() {
     setIsPlacing(true);
     try {
       const sessionId = ensureCartSessionId();
-      const shipping = {
-        first_name: formData.firstName,
-        last_name: formData.lastName,
-        address_line1: formData.address,
-        city: formData.city,
-        country: formData.country,
-        postal_code: formData.postalCode,
-        email: formData.email,
-        phone: formData.phone,
-      };
-
-      let paymentId: number | undefined;
-
+      
       if (selectedMethod?.type === "online" || selectedMethod?.gateway) {
         const paymentRes = await createPayment({
           payment_method_id: Number(paymentMethodId),
@@ -98,19 +108,51 @@ export default function CheckoutPage() {
             postal_code: formData.postalCode,
           },
         });
-        paymentId = paymentRes.payment.id;
+        
+        if (paymentRes.checkout?.type === "redirect") {
+          setIsRedirecting(true);
+          redirectToGateway(paymentRes.checkout);
+          return;
+        }
+        
+        const orderRes = await placeOrder({
+          payment_id: paymentRes.payment.id,
+          session_id: sessionId,
+          shipping: {
+            first_name: formData.firstName,
+            last_name: formData.lastName,
+            address_line1: formData.address,
+            city: formData.city,
+            country: formData.country,
+            postal_code: formData.postalCode,
+            email: formData.email,
+            phone: formData.phone,
+          },
+        });
+        
+        setOrderId(orderRes.order.order_number);
+        setOrderPlaced(true);
+        await clearCart();
+      } else {
+        const orderRes = await placeOrder({
+          payment_method_id: Number(paymentMethodId),
+          session_id: sessionId,
+          shipping: {
+            first_name: formData.firstName,
+            last_name: formData.lastName,
+            address_line1: formData.address,
+            city: formData.city,
+            country: formData.country,
+            postal_code: formData.postalCode,
+            email: formData.email,
+            phone: formData.phone,
+          },
+        });
+        
+        setOrderId(orderRes.order.order_number);
+        setOrderPlaced(true);
+        await clearCart();
       }
-
-      const orderRes = await placeOrder({
-        payment_id: paymentId,
-        payment_method_id: paymentId ? undefined : Number(paymentMethodId),
-        session_id: sessionId,
-        shipping,
-      });
-
-      setOrderId(orderRes.order.order_number);
-      setOrderPlaced(true);
-      await clearCart();
     } catch (error: any) {
       toast({ title: "Order failed", description: error?.message || "Please try again.", variant: "destructive" });
     } finally {
@@ -235,11 +277,11 @@ export default function CheckoutPage() {
               <div className="flex justify-between text-sm"><span className="text-muted-foreground">Shipping</span><span className="text-success">Free</span></div>
               <div className="border-t border-border pt-2 flex justify-between"><span className="font-display font-bold text-lg">Total</span><span className="font-display font-bold text-lg text-primary">{formatPrice(total)}</span></div>
             </div>
-            <Button type="submit" className="w-full mt-6" size="lg" disabled={isPlacing || !paymentMethodId}>
-              {isPlacing ? "Placing Order..." : `Place Order — ${formatPrice(total)}`}
-            </Button>
-          </div>
-        </form>
+<Button type="submit" className="w-full mt-6" size="lg" disabled={isPlacing || isRedirecting || !paymentMethodId}>
+               {isRedirecting ? "Redirecting to PayHere..." : isPlacing ? "Placing Order..." : `Place Order — ${formatPrice(total)}`}
+             </Button>
+           </div>
+         </form>
       </div>
     </Layout>
   );
