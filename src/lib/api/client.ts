@@ -1,4 +1,4 @@
-const APP_URL = (import.meta as any).env?.VITE_APP_URL || (import.meta as any).env?.APP_URL || "";
+const APP_URL = import.meta.env.VITE_APP_URL || "";
 const API_BASE_URL = APP_URL ? `${String(APP_URL).replace(/\/$/, "")}/api` : "/api";
 
 const AUTH_TOKEN_KEY = "auth_token";
