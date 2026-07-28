@@ -14,6 +14,8 @@ import Layout from "@/components/layout/Layout";
 import { useCatalog } from "@/hooks/useCatalog";
 import { CATEGORIES } from "@/types/product";
 import { motion, AnimatePresence } from "framer-motion";
+import LaunchBanner from "@/components/launch/LaunchBanner";
+import { LAUNCH_MODE } from "@/config/launch";
 
 const CATEGORY_ICONS: Record<string, React.ReactNode> = {
   jewelry: <Gem className="h-6 w-6" />,
@@ -228,6 +230,8 @@ export default function Index() {
           ))}
         </div>
       </section>
+
+      {LAUNCH_MODE && <LaunchBanner />}
 
       {/* Flash Sale Banner */}
       {/* <section className="bg-gradient-to-r from-destructive/90 to-accent py-6 text-primary-foreground">

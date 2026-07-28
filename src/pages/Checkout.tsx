@@ -15,6 +15,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { ensureCartSessionId } from "@/lib/cartSession";
 import { useToast } from "@/hooks/use-toast";
 import { ApiCheckoutRedirect } from "@/lib/api/types";
+import { LAUNCH_MODE } from "@/config/launch";
 
 export default function CheckoutPage() {
   const { items, subtotal, taxTotal, discountTotal, total, clearCart } = useCart();
@@ -46,6 +47,35 @@ export default function CheckoutPage() {
       phone: user.mobile || current.phone,
     }));
   }, [user]);
+
+  if (LAUNCH_MODE) {
+
+      return (
+
+          <Layout>
+
+              <div className="container mx-auto py-24 text-center">
+
+                  <h1 className="text-4xl font-bold">
+
+                      🚀 Checkout opens on launch day
+
+                  </h1>
+
+                  <p className="mt-3 text-muted-foreground">
+
+                      Create your account, browse products and
+                      build your wishlist while we prepare for launch.
+
+                  </p>
+
+              </div>
+
+          </Layout>
+
+      );
+
+  }
 
   const activeMethods = useMemo(() => methods.filter((m) => m.active), [methods]);
   const [paymentMethodId, setPaymentMethodId] = useState<string>(activeMethods[0] ? String(activeMethods[0].id) : "");

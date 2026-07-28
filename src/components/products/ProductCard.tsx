@@ -8,6 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
+import { LAUNCH_MODE } from "@/config/launch";
 
 interface ProductCardProps {
   product: Product;
@@ -68,10 +69,24 @@ export default function ProductCard({ product, view = "grid" }: ProductCardProps
               >
                 <Heart className={cn("h-5 w-5", wishlisted && "fill-destructive text-destructive")} />
               </Button>
-              <Button size="sm" onClick={() => addItem(product)} disabled={!product.inStock}>
-                <ShoppingCart className="h-4 w-4 mr-1" />
-                {product.inStock ? "Add" : "Out of Stock"}
-              </Button>
+              {LAUNCH_MODE ? (
+                <Button
+                    size="sm"
+                    disabled
+                    variant="secondary"
+                >
+                    Launching Soon
+                </Button>
+            ) : (
+                <Button
+                    size="sm"
+                    onClick={() => addItem(product)}
+                    disabled={!product.inStock}
+                >
+                    <ShoppingCart className="h-4 w-4 mr-1" />
+                    {product.inStock ? "Add" : "Out of Stock"}
+                </Button>
+            )}
             </div>
           </div>
         </div>
@@ -146,15 +161,25 @@ export default function ProductCard({ product, view = "grid" }: ProductCardProps
               <span className="text-xs text-muted-foreground line-through ml-2">{formatPrice(product.originalPrice)}</span>
             )}
           </div>
-          <Button
-            size="icon"
-            variant="secondary"
-            className="h-8 w-8"
-            onClick={() => addItem(product)}
-            disabled={!product.inStock}
-          >
-            <ShoppingCart className="h-4 w-4" />
-          </Button>
+          {LAUNCH_MODE ? (
+            <Button
+                variant="secondary"
+                disabled
+                className="text-xs px-3"
+            >
+                Launching Soon
+            </Button>
+        ) : (
+            <Button
+                size="icon"
+                variant="secondary"
+                className="h-8 w-8"
+                onClick={() => addItem(product)}
+                disabled={!product.inStock}
+            >
+                <ShoppingCart className="h-4 w-4" />
+            </Button>
+        )}
         </div>
       </div>
     </motion.div>
