@@ -12,6 +12,8 @@ import { useWishlist } from "@/contexts/WishlistContext";
 import { useCatalog } from "@/hooks/useCatalog";
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
+import SocialLoginButtons from "@/components/auth/SocialLoginButtons";
+import PhoneNumberModal from "@/components/auth/PhoneNumberModal";
 
 export default function AccountPage() {
   const { wishlist } = useWishlist();
@@ -25,6 +27,7 @@ export default function AccountPage() {
   const [agreedToTerms, setAgreedToTerms] = useState(false);
   const [agreedToRefund, setAgreedToRefund] = useState(false);
   const [profileForm, setProfileForm] = useState({ name: "", email: "", mobile: "" });
+  const [phonePopup, setPhonePopup] = useState(false);
 
   useEffect(() => {
     if (user) {
@@ -71,6 +74,37 @@ export default function AccountPage() {
     }
   };
 
+  const googleLogin = async () => {
+
+    /*
+        later
+
+        window.location.href =
+        API_URL+"/auth/google"
+
+    */
+
+    console.log("Google Login");
+
+    setPhonePopup(true);
+};
+
+const facebookLogin = async () => {
+
+    console.log("Facebook Login");
+
+    setPhonePopup(true);
+
+};
+
+const savePhone = async (phone: string) => {
+
+    console.log(phone);
+
+    setPhonePopup(false);
+
+};
+
   if (isLoading && !user) {
     return (
       <Layout>
@@ -90,6 +124,10 @@ export default function AccountPage() {
               {isSignUp ? "Create Account" : "Welcome Back"}
             </h1>
             <form onSubmit={handleAuthSubmit} className="space-y-4">
+              <SocialLoginButtons
+                  onGoogle={googleLogin}
+                  onFacebook={facebookLogin}
+              />
               {isSignUp && (
                 <>
                   <div>
@@ -135,6 +173,10 @@ export default function AccountPage() {
               <Button type="submit" className="w-full" size="lg" disabled={isLoading}>
                 {isSignUp ? "Sign Up" : "Log In"}
               </Button>
+              <PhoneNumberModal
+                  open={phonePopup}
+                  onSubmit={savePhone}
+              />
             </form>
             <p className="text-center text-sm text-muted-foreground mt-4">
               {isSignUp ? "Already have an account?" : "Don't have an account?"}{" "}
