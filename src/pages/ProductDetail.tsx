@@ -14,6 +14,7 @@ import { cn } from "@/lib/utils";
 import { motion, AnimatePresence } from "framer-motion";
 import { useCatalog } from "@/hooks/useCatalog";
 import { useToast } from "@/hooks/use-toast";
+import { LAUNCH_MODE } from "@/config/launch";
 
 export default function ProductDetailPage() {
   const { slug } = useParams();
@@ -200,19 +201,69 @@ export default function ProductDetailPage() {
 
              {/* Add to Cart & Buy Now */}
             <div className="flex flex-col gap-3 mt-6">
+
               <div className="flex items-center gap-3">
-                <Button size="lg" onClick={() => addItem(product, quantity)} disabled={!product.inStock || product.inquiryOnly} className="flex-1 h-11">
-                  <ShoppingCart className="h-4 w-4 mr-2" />
-                  {product.inquiryOnly ? "Inquiry Only" : product.inStock ? "Add to Cart" : "Out of Stock"}
-                </Button>
-                <Button size="lg" variant="outline" onClick={() => toggleWishlist(product.id)} className="h-11 w-11 flex-shrink-0" >
-                  <Heart className={cn("h-4 w-4", wishlisted && "fill-destructive text-destructive")} />
-                </Button>
-              </div>  
-<Button size="lg" onClick={handleBuyNow} disabled={!product.inStock || product.inquiryOnly} className="w-full sm:w-auto h-11 bg-white border border-purple-600 text-purple-700 hover:bg-purple-50">
-                 Buy Now
-               </Button>
-             </div>
+
+                  {LAUNCH_MODE ? (
+
+                      <Button
+                          size="lg"
+                          disabled
+                          className="flex-1 h-11"
+                      >
+                           Available on Launch Day
+                      </Button>
+
+                  ) : (
+
+                      <Button
+                          size="lg"
+                          onClick={() => addItem(product, quantity)}
+                          disabled={!product.inStock || product.inquiryOnly}
+                          className="flex-1 h-11"
+                      >
+                          <ShoppingCart className="h-4 w-4 mr-2" />
+
+                          {product.inquiryOnly
+                              ? "Inquiry Only"
+                              : product.inStock
+                              ? "Add to Cart"
+                              : "Out of Stock"}
+                      </Button>
+
+                  )}
+
+                  <Button
+                      size="lg"
+                      variant="outline"
+                      onClick={() => toggleWishlist(product.id)}
+                      className="h-11 w-11"
+                  >
+                      <Heart
+                          className={cn(
+                              "h-4 w-4",
+                              wishlisted &&
+                                  "fill-destructive text-destructive"
+                          )}
+                      />
+                  </Button>
+
+              </div>
+
+              {!LAUNCH_MODE && (
+
+                  <Button
+                      size="lg"
+                      onClick={handleBuyNow}
+                      disabled={!product.inStock || product.inquiryOnly}
+                      className="bg-white border border-purple-600 text-purple-700 hover:bg-purple-50"
+                  >
+                      Buy Now
+                  </Button>
+
+              )}
+
+          </div>
 
             {/* Payment Methods */}
             {/* <PaymentMethods /> */}

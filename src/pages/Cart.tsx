@@ -7,6 +7,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { formatPrice } from "@/lib/format";
 import { motion, AnimatePresence } from "framer-motion";
 import { useToast } from "@/hooks/use-toast";
+import { LAUNCH_MODE } from "@/config/launch";
 
 export default function CartPage() {
   const { items, removeItem, updateQuantity, subtotal, taxTotal, discountTotal, total, itemCount, isLoading } = useCart();
@@ -98,6 +99,25 @@ export default function CartPage() {
             </AnimatePresence>
           </div>
 
+          {LAUNCH_MODE && (
+
+            <div className="mb-6 rounded-xl border border-primary bg-primary/5 p-4">
+
+            <h2 className="font-semibold">
+
+             Checkout will be available after launch.
+
+            </h2>
+
+            <p className="text-sm text-muted-foreground mt-2">
+              You can continue browsing products and save your favourites to your
+              wishlist.
+            </p>
+
+            </div>
+
+            )}
+
           {/* Order Summary */}
           <div className="glass rounded-xl p-6 h-fit sticky top-24">
             <h2 className="font-display text-xl font-bold mb-4">Order Summary</h2>
@@ -133,7 +153,12 @@ export default function CartPage() {
               Discounts and taxes are calculated at checkout.
             </div>
 
-<Button className="w-full mt-6" size="lg" onClick={handleCheckout}>
+<Button
+    className="w-full mt-6"
+    size="lg"
+    onClick={handleCheckout}
+    disabled={LAUNCH_MODE}
+>
                Proceed to Checkout <ArrowRight className="ml-2 h-4 w-4" />
              </Button>
 

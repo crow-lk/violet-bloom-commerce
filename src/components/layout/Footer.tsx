@@ -64,7 +64,17 @@ export default function Footer() {
             <span>•</span>
             <Link to="/refund-policy" className="hover:text-primary-foreground transition-colors">Refund Policy</Link>
           </div>
-          <p>Powered by crow.lk</p>
+          <p className="text-white font-medium">
+            Powered by{" "}
+            <a
+              href="https://crow.lk"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="font-bold hover:underline"
+            >
+              crow.lk
+            </a>
+          </p>
         </div>
       </div>
     </footer>

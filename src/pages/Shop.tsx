@@ -11,6 +11,7 @@ import Layout from "@/components/layout/Layout";
 import { useCatalog } from "@/hooks/useCatalog";
 import { CATEGORIES, ProductCategory } from "@/types/product";
 import { motion, AnimatePresence } from "framer-motion";
+import { LAUNCH_MODE } from "@/config/launch";
 const ITEMS_PER_PAGE = 12;
 
 export default function ShopPage() {
@@ -135,6 +136,25 @@ export default function ShopPage() {
             </Button>
           </div>
         </div>
+
+        {LAUNCH_MODE && (
+
+          <div className="mb-8 rounded-2xl border border-primary/20 bg-primary/5 p-6">
+
+              <h2 className="text-2xl font-bold">
+
+                   Buying will be enabled on launch day
+
+              </h2>
+
+              <p className="mt-2 text-muted-foreground">
+                Create your account today, explore our products, and add your favourite
+                items to your wishlist. Shopping will be available on launch day.
+              </p>
+
+          </div>
+
+          )}
 
         <div className="flex gap-8">
           {/* Filters Sidebar */}

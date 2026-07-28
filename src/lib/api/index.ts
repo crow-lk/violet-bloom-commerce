@@ -65,3 +65,18 @@ export const placeOrder = (payload: Record<string, unknown>) =>
     method: "POST",
     json: payload,
   });
+
+export const socialLogin = (
+    provider: "google" | "facebook",
+    payload: {
+        access_token?: string;
+        id_token?: string;
+    }
+) =>
+    apiFetch<ApiAuthResponse>(
+        `/auth/social/${provider}`,
+        {
+            method: "POST",
+            json: payload,
+        }
+    );

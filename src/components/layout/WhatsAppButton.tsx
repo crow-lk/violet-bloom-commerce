@@ -11,7 +11,7 @@ export default function WhatsAppButton() {
       href={url}
       target="_blank"
       rel="noopener noreferrer"
-      className="fixed bottom-6 right-6 z-50 gradient-purple p-4 rounded-full shadow-purple-lg hover:scale-110 transition-transform"
+      className="fixed bottom-[70px] right-6 z-50 gradient-purple p-4 rounded-full shadow-purple-lg hover:scale-110 transition-transform"
       initial={{ scale: 0 }}
       animate={{ scale: 1 }}
       transition={{ delay: 1, type: "spring" }}
