@@ -41,9 +41,9 @@ export default function Footer() {
           <div>
             <h3 className="font-display font-semibold mb-4">Contact</h3>
             <ul className="space-y-2 text-sm text-primary-foreground/80">
-              <li className="flex items-center gap-2"><Mail className="h-4 w-4" /> support@chuttakpay.com</li>
-              <li className="flex items-center gap-2"><Phone className="h-4 w-4" /> 075 922 4225</li>
-              <li className="flex items-center gap-2"><MapPin className="h-4 w-4" /> Ratnapura, Sri Lanka</li>
+              <li className="flex items-center gap-2"><Mail className="h-4 w-4" />support@chuttakpay.com</li>
+              <li className="flex items-center gap-2"><Phone className="h-4 w-4" />0775 500 516</li>
+              <li className="flex items-center gap-2"><MapPin className="h-4 w-4" />No.62, Goods Shed Road, Ratnapura</li>
             </ul>
           </div>
         </div>

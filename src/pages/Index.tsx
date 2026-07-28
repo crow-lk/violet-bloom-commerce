@@ -56,7 +56,7 @@ const heroSlides = [
     title: "Trending Jewelry",
     subtitle: "Elegant necklaces, earrings & bracelets",
     cta: "Explore Collection",
-    link: "/shop?category=jewelry",
+    link: "/shop?category=jewellery-fashion-accessories",
     badge: "✨ Trending",
     image: heroTrending,
   },
@@ -64,7 +64,7 @@ const heroSlides = [
     title: "Home Essentials",
     subtitle: "Kitchen, storage & cleaning at unbeatable prices",
     cta: "Shop Home",
-    link: "/shop?category=kitchen",
+    link: "/shop?category=home-kitchen",
     badge: "🏠 New Arrivals",
     image: heroHome,
   },
@@ -72,7 +72,7 @@ const heroSlides = [
     title: "Kids' Favorites",
     subtitle: "Toys, stationery & fun accessories",
     cta: "Shop for Kids",
-    link: "/shop?category=toys",
+    link: "/shop?category=toys-kids-items",
     badge: "🎁 Gift Ideas",
     image: heroKids,
   },
@@ -440,8 +440,8 @@ export default function Index() {
       {/* Promo Banners */}
       <section className="py-16 bg-muted/50">
         <div className="container mx-auto px-4">
-          <div className="grid md:grid-cols-2 gap-6">
-            <motion.div
+          <div className="grid md:grid-cols-1 gap-6 max-w-2xl mx-auto">
+            {/* <motion.div
               initial={{ opacity: 0, x: -20 }}
               whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true }}
@@ -453,14 +453,14 @@ export default function Index() {
               <Button asChild className="mt-4 bg-primary-foreground text-primary hover:bg-primary-foreground/90">
                 <Link to="/shop">Shop Now</Link>
               </Button>
-            </motion.div>
-            <motion.div
-              initial={{ opacity: 0, x: 20 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true }}
-              className="bg-foreground rounded-2xl p-8 text-background"
-            >
-              <div className="flex items-center gap-4 mb-4">
+            </motion.div> */}
+<motion.div
+               initial={{ opacity: 0, x: 20 }}
+               whileInView={{ opacity: 1, x: 0 }}
+               viewport={{ once: true }}
+               className="bg-foreground rounded-2xl p-8 text-background flex flex-col items-center text-center"
+             >
+              <div className="flex items-center justify-center gap-4 mb-4">
                 <a href="" target="_blank">
                   <img src="https://www.payhere.lk/downloads/images/payhere_short_banner_dark.png" alt="PayHere" width="250" />
                 </a>
@@ -472,7 +472,7 @@ export default function Index() {
                   className="[filter:hue-rotate(265deg)_saturate(3)_brightness(0.9)]"
                 />
               </div>
-              <h3 className="font-display text-2xl font-bold text-left">Pay Your Way</h3>
+              <h3 className="font-display text-2xl font-bold">Pay Your Way</h3>
               <Button asChild className="mt-4" variant="secondary">
                 <Link to="/shop">Shop Now</Link>
               </Button>

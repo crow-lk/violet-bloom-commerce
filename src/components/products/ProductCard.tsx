@@ -19,7 +19,8 @@ export default function ProductCard({ product, view = "grid" }: ProductCardProps
   const { addItem } = useCart();
   const { toggleWishlist, isInWishlist } = useWishlist();
   const wishlisted = isInWishlist(product.id);
-  const showPrice = !product.inquiryOnly && product.price > 0;
+  const showPrice = product.price > 0;
+  const inquiryDisabled = product.inquiryOnly || product.showPriceInquiryMode;
 
   if (view === "list") {
     return (
@@ -70,23 +71,15 @@ export default function ProductCard({ product, view = "grid" }: ProductCardProps
                 <Heart className={cn("h-5 w-5", wishlisted && "fill-destructive text-destructive")} />
               </Button>
               {LAUNCH_MODE ? (
-                <Button
-                    size="sm"
-                    disabled
-                    variant="secondary"
-                >
-                    Launching Soon
+                <Button size="sm" disabled variant="secondary">
+                  Launching Soon
                 </Button>
-            ) : (
-                <Button
-                    size="sm"
-                    onClick={() => addItem(product)}
-                    disabled={!product.inStock}
-                >
-                    <ShoppingCart className="h-4 w-4 mr-1" />
-                    {product.inStock ? "Add" : "Out of Stock"}
+              ) : (
+                <Button size="sm" onClick={() => addItem(product)} disabled={!product.inStock || inquiryDisabled}>
+                  <ShoppingCart className="h-4 w-4 mr-1" />
+                  {product.inStock ? "Add" : "Out of Stock"}
                 </Button>
-            )}
+              )}
             </div>
           </div>
         </div>
@@ -177,7 +170,7 @@ export default function ProductCard({ product, view = "grid" }: ProductCardProps
               variant="secondary"
               className="h-8 w-8"
               onClick={() => addItem(product)}
-              disabled={!product.inStock}
+              disabled={!product.inStock || inquiryDisabled}
             >
               <ShoppingCart className="h-4 w-4" />
             </Button>
