@@ -18,7 +18,15 @@ import PhoneNumberModal from "@/components/auth/PhoneNumberModal";
 export default function AccountPage() {
   const { wishlist } = useWishlist();
   const { products } = useCatalog();
-  const { user, isLoading, login, register, logout, updateProfile } = useAuth();
+  const {
+    user,
+    isLoading,
+    login,
+    register,
+    socialLogin,
+    logout,
+    updateProfile,
+  } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
   const { toast } = useToast();
@@ -74,26 +82,76 @@ export default function AccountPage() {
     }
   };
 
-  const googleLogin = async () => {
+  const googleLogin = async (
+      accessToken: string
+  ) => {
 
-    /*
-        later
+      const success = await socialLogin(
+          "google",
+          accessToken
+      );
 
-        window.location.href =
-        API_URL+"/auth/google"
+      if (!success) {
 
-    */
+          toast({
+              title: "Google login failed",
+              variant: "destructive",
+          });
 
-    console.log("Google Login");
+          return;
+      }
 
-    setPhonePopup(true);
-};
+      if (!user?.mobile) {
+
+          setPhonePopup(true);
+
+          return;
+      }
+
+      navigate("/account");
+
+  };
 
 const facebookLogin = async () => {
 
-    console.log("Facebook Login");
+    window.FB.login(
 
-    setPhonePopup(true);
+        async (response: any) => {
+
+            if (!response.authResponse) {
+
+                toast({
+                    title: "Facebook login cancelled",
+                    variant: "destructive",
+                });
+
+                return;
+            }
+
+            const success = await socialLogin(
+                "facebook",
+                response.authResponse.accessToken
+            );
+
+            if (!success) {
+
+                toast({
+                    title: "Facebook login failed",
+                    variant: "destructive",
+                });
+
+                return;
+            }
+
+            navigate("/account");
+
+        },
+
+        {
+            scope: "email,public_profile",
+        }
+
+    );
 
 };
 

@@ -2,6 +2,7 @@ import React, { createContext, useContext, useEffect, useMemo, useState } from "
 import { ApiUser } from "@/lib/api/types";
 import { getMe, login as apiLogin, logout as apiLogout, register as apiRegister, updatePassword as apiUpdatePassword, updateProfile as apiUpdateProfile } from "@/lib/api";
 import { getAuthToken, setAuthToken } from "@/lib/api/client";
+import { socialLogin as apiSocialLogin } from "@/lib/api";
 
 interface AuthContextType {
   user: ApiUser | null;
@@ -13,6 +14,10 @@ interface AuthContextType {
   refresh: () => Promise<void>;
   updateProfile: (payload: { name: string; email: string; mobile?: string | null }) => Promise<boolean>;
   updatePassword: (payload: { current_password: string; password: string; password_confirmation: string }) => Promise<boolean>;
+  socialLogin: (
+      provider: "google" | "facebook",
+      token: string
+  ) => Promise<boolean>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -39,6 +44,29 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const socialLogin = async (
+      provider: "google" | "facebook",
+      accessToken: string
+  ) => {
+      setIsLoading(true);
+
+      try {
+          const res = await apiSocialLogin(provider, {
+              access_token: accessToken,
+          });
+
+          setAuthToken(res.token);
+          setToken(res.token);
+          setUser(res.user);
+
+          return true;
+      } catch {
+          return false;
+      } finally {
+          setIsLoading(false);
+      }
   };
 
   useEffect(() => {
@@ -113,7 +141,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   const value = useMemo(
-    () => ({ user, token, isLoading, login, register, logout, refresh, updateProfile, updatePassword }),
+    () => ({
+      user,
+      token,
+      isLoading,
+      login,
+      register,
+      socialLogin,
+      logout,
+      refresh,
+      updateProfile,
+      updatePassword,
+    }),
     [user, token, isLoading]
   );
 
