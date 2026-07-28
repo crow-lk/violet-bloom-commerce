@@ -8,7 +8,7 @@ export default function LaunchCountdown() {
         <div className="glass rounded-3xl p-10 text-center shadow-purple">
 
             <h2 className="font-display text-4xl font-bold mb-3">
-                🚀 ChuttakPay is Launching Soon
+                 ChuttakPay is Launching Soon
             </h2>
 
             <p className="text-muted-foreground mb-8">

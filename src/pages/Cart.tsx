@@ -105,14 +105,13 @@ export default function CartPage() {
 
             <h2 className="font-semibold">
 
-            🚀 Checkout will be available after launch.
+             Checkout will be available after launch.
 
             </h2>
 
-            <p className="text-sm text-muted-foreground mt-1">
-
-            You can continue browsing and saving products to your wishlist.
-
+            <p className="text-sm text-muted-foreground mt-2">
+              You can continue browsing products and save your favourites to your
+              wishlist.
             </p>
 
             </div>

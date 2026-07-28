@@ -210,7 +210,7 @@ export default function ProductDetailPage() {
                           disabled
                           className="flex-1 h-11"
                       >
-                          🚀 Available on Launch Day
+                           Available on Launch Day
                       </Button>
 
                   ) : (

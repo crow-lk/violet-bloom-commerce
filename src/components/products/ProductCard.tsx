@@ -163,23 +163,25 @@ export default function ProductCard({ product, view = "grid" }: ProductCardProps
           </div>
           {LAUNCH_MODE ? (
             <Button
-                variant="secondary"
-                disabled
-                className="text-xs px-3"
+              size="icon"
+              variant="secondary"
+              className="h-8 w-8"
+              disabled
+              title="Shopping will be available on launch day"
             >
-                Launching Soon
+              <ShoppingCart className="h-4 w-4 opacity-60" />
             </Button>
-        ) : (
+          ) : (
             <Button
-                size="icon"
-                variant="secondary"
-                className="h-8 w-8"
-                onClick={() => addItem(product)}
-                disabled={!product.inStock}
+              size="icon"
+              variant="secondary"
+              className="h-8 w-8"
+              onClick={() => addItem(product)}
+              disabled={!product.inStock}
             >
-                <ShoppingCart className="h-4 w-4" />
+              <ShoppingCart className="h-4 w-4" />
             </Button>
-        )}
+          )}
         </div>
       </div>
     </motion.div>

@@ -143,15 +143,13 @@ export default function ShopPage() {
 
               <h2 className="text-2xl font-bold">
 
-                  🚀 Buying will be enabled on launch day
+                   Buying will be enabled on launch day
 
               </h2>
 
               <p className="mt-2 text-muted-foreground">
-
-                  Create your account today and start building your wishlist.
-                  All wishlist items will be waiting for you when we launch.
-
+                Create your account today, explore our products, and add your favourite
+                items to your wishlist. Shopping will be available on launch day.
               </p>
 
           </div>

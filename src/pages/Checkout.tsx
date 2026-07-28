@@ -58,7 +58,7 @@ export default function CheckoutPage() {
 
                   <h1 className="text-4xl font-bold">
 
-                      🚀 Checkout opens on launch day
+                       Checkout opens on launch day
 
                   </h1>
 
