@@ -56,7 +56,7 @@ export default function RefundPolicy() {
             <h2 className="font-display text-xl font-semibold text-foreground">Contact Us</h2>
             <p>If you have any questions or concerns regarding our refund policy, please contact our customer support team. We are here to assist you and ensure your shopping experience with us is enjoyable and hassle-free.</p>
             <p>
-              <a href="https://wa.me/94759224225" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">
+              <a href="https://wa.me/94775500516" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">
                 Chat with us on WhatsApp
               </a>
             </p>

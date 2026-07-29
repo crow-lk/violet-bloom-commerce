@@ -29,9 +29,9 @@ export default function ContactPage() {
 
   const contactInfo = [
     { icon: <Mail className="h-5 w-5" />, title: "Email", value: "support@chuttakpay.com", link: "mailto:support@chuttakpay.com" },
-    { icon: <Phone className="h-5 w-5" />, title: "Phone", value: "075 922 4225", link: "tel:075 922 4225" },
+    { icon: <Phone className="h-5 w-5" />, title: "Phone", value: "0775 500 516", link: "tel:0775 500 516" },
     { icon: <MapPin className="h-5 w-5" />, title: "Address", value: "No. 62, Goods Shed Road, Ratnapura 70000", link: null },
-    { icon: <Clock className="h-5 w-5" />, title: "Hours", value: "Mon - Sat: 9AM - 6PM", link: null },
+    { icon: <Clock className="h-5 w-5" />, title: "Hours", value: "Mon - Sat: 10AM - 8.30PM", link: null },
   ];
 
   return (
@@ -102,7 +102,7 @@ export default function ContactPage() {
                 className="mt-6"
               >
                 <a
-                  href="https://wa.me/94771234567"
+                  href="https://wa.me/94775500516"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="flex items-center gap-3 glass rounded-xl p-4 hover:shadow-purple transition-shadow group"
@@ -163,7 +163,7 @@ export default function ContactPage() {
                       value={formData.phone}
                       onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
                       className="mt-1"
-                      placeholder="0759224225"
+                      placeholder="0775500516"
                     />
                   </div>
                   <div>
