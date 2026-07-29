@@ -75,7 +75,8 @@ export function mapProduct(
     createdAt: product.created_at || product.updated_at || new Date().toISOString(),
     defaultVariantId: variant ? String(variant.id) : undefined,
     variantSku: variant?.sku,
-    inquiryOnly: product.inquiry_only || product.show_price_inquiry_mode || false,
+    inquiryOnly: product.inquiry_only || false,
+    showPriceInquiryMode: product.show_price_inquiry_mode || false,
     variants: product.variants || [],
   };
 }

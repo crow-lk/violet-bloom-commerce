@@ -24,6 +24,7 @@ export interface Product {
   defaultVariantId?: string;
   variantSku?: string;
   inquiryOnly?: boolean;
+  showPriceInquiryMode?: boolean;
   variants?: Array<{
     id: number;
     sku: string;

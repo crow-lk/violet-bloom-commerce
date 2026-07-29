@@ -72,7 +72,8 @@ export default function ProductDetailPage() {
 
   const wishlisted = isInWishlist(product.id);
   const relatedProducts = products.filter((p) => p.category === product.category && p.id !== product.id);
-  const showPrice = !product.inquiryOnly && product.price > 0;
+  const showPrice = product.price > 0;
+  const inquiryDisabled = product.inquiryOnly || product.showPriceInquiryMode;
 
   return (
     <Layout>
