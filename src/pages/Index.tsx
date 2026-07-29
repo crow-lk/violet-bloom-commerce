@@ -417,7 +417,7 @@ export default function Index() {
       </section> */}
 
       {/* Chuttak Pay Membership */}
-      <section className="py-16 bg-primary/5">
+      {/*<section className="py-16 bg-primary/5">
         <div className="container mx-auto px-4 text-center">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -435,7 +435,7 @@ export default function Index() {
             </Button>
           </motion.div>
         </div>
-      </section>
+      </section>*/}
 
       {/* Promo Banners */}
       <section className="py-16 bg-muted/50">
