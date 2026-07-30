@@ -12,7 +12,7 @@ import { Badge } from "@/components/ui/badge";
 import ProductCard from "@/components/products/ProductCard";
 import Layout from "@/components/layout/Layout";
 import { useCatalog } from "@/hooks/useCatalog";
-import { CATEGORIES } from "@/types/product";
+import { CATEGORIES, Product } from "@/types/product";
 import { motion, AnimatePresence } from "framer-motion";
 import LaunchBanner from "@/components/launch/LaunchBanner";
 import { LAUNCH_MODE } from "@/config/launch";
@@ -110,20 +110,43 @@ function CountdownTimer() {
   );
 }
 
-const getRandomProductsByDay = (items: typeof products, count: number) => {
-  const daySeed = new Date().getDate() + new Date().getMonth() * 31 + new Date().getFullYear() * 365;
-  const seededRandom = (seed: number) => {
-    const x = Math.sin(seed) * 10000;
-    return x - Math.floor(x);
+const PRODUCT_ROTATION_INTERVAL_MS = 15 * 60 * 1000;
+
+const getRotationBucket = () => Math.floor(Date.now() / PRODUCT_ROTATION_INTERVAL_MS);
+
+function getRotatingProducts(items: Product[], count: number, rotationBucket: number, seedOffset: number): Product[] {
+  let seed = rotationBucket + seedOffset;
+  const random = () => {
+    seed = (seed * 1664525 + 1013904223) >>> 0;
+    return seed / 0x100000000;
   };
-  const shuffled = [...items].sort(() => seededRandom(daySeed) - 0.5);
+
+  const shuffled = [...items];
+  for (let index = shuffled.length - 1; index > 0; index--) {
+    const randomIndex = Math.floor(random() * (index + 1));
+    [shuffled[index], shuffled[randomIndex]] = [shuffled[randomIndex], shuffled[index]];
+  }
+
   return shuffled.slice(0, count);
-};
+}
 
 export default function Index() {
   const { products, categories } = useCatalog();
-  const featured = products.filter((p) => p.isFeatured).slice(0, 6);
-  const trending = getRandomProductsByDay(products, 8);
+  const [rotationBucket, setRotationBucket] = useState(getRotationBucket);
+  const featuredCandidates = products.filter((p) => p.isFeatured);
+  const trendingCandidates = products.filter((p) => p.isTrending);
+  const featured = getRotatingProducts(
+    featuredCandidates.length >= 6 ? featuredCandidates : products,
+    6,
+    rotationBucket,
+    11
+  );
+  const trending = getRotatingProducts(
+    trendingCandidates.length >= 8 ? trendingCandidates : products,
+    8,
+    rotationBucket,
+    29
+  );
   const deals = products
     .filter((p) => (p.discount || 0) > 0)
     .sort((a, b) => (b.discount || 0) - (a.discount || 0))
@@ -151,6 +174,23 @@ export default function Index() {
     const interval = setInterval(nextSlide, 5000);
     return () => clearInterval(interval);
   }, [nextSlide]);
+
+  useEffect(() => {
+    let interval: ReturnType<typeof setInterval>;
+    const timeout = setTimeout(() => {
+      setRotationBucket(getRotationBucket());
+      interval = setInterval(() => setRotationBucket(getRotationBucket()), PRODUCT_ROTATION_INTERVAL_MS);
+    }, PRODUCT_ROTATION_INTERVAL_MS - (Date.now() % PRODUCT_ROTATION_INTERVAL_MS));
+
+    return () => {
+      clearTimeout(timeout);
+      clearInterval(interval);
+    };
+  }, []);
+
+  useEffect(() => {
+    setCarouselIdx(0);
+  }, [rotationBucket]);
 
   return (
     <Layout>
@@ -438,9 +478,9 @@ export default function Index() {
       </section>*/}
 
       {/* Promo Banners */}
-      <section className="py-16 bg-muted/50">
+      {/* <section className="py-16 bg-muted/50">
         <div className="container mx-auto px-4">
-          <div className="grid md:grid-cols-1 gap-6 max-w-2xl mx-auto">
+          <div className="grid md:grid-cols-1 gap-6 max-w-2xl mx-auto"> */}
             {/* <motion.div
               initial={{ opacity: 0, x: -20 }}
               whileInView={{ opacity: 1, x: 0 }}
@@ -454,7 +494,7 @@ export default function Index() {
                 <Link to="/shop">Shop Now</Link>
               </Button>
             </motion.div> */}
-<motion.div
+{/* <motion.div
                initial={{ opacity: 0, x: 20 }}
                whileInView={{ opacity: 1, x: 0 }}
                viewport={{ once: true }}
@@ -479,7 +519,7 @@ export default function Index() {
             </motion.div>
           </div>
         </div>
-      </section>
+      </section> */}
 
       {/* Newsletter */}
       <section className="py-16">
