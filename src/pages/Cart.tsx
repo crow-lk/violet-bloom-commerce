@@ -139,10 +139,10 @@ export default function CartPage() {
                   <span>{formatPrice(taxTotal)}</span>
                 </div>
               )}
-              <div className="flex justify-between text-sm">
+              {/* <div className="flex justify-between text-sm">
                 <span className="text-muted-foreground">Shipping</span>
                 <span className="text-success">Free</span>
-              </div>
+              </div> */}
               <div className="border-t border-border pt-3 flex justify-between">
                 <span className="font-display font-bold text-lg">Total</span>
                 <span className="font-display font-bold text-lg text-primary">{formatPrice(total)}</span>
