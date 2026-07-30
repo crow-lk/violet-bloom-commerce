@@ -169,3 +169,39 @@ export interface ApiSettingsSocialLogin {
     facebook?: { enabled: boolean; client_id?: string; redirect?: string };
   };
 }
+
+export interface ApiDeliveryRateCity {
+  delivery_rate_id: number;
+  city: string;
+  first_kg_charge: number | string;
+  additional_kg_charge: number | string;
+  cp_rates: number | string;
+}
+
+export interface ApiDeliveryRateQuote {
+  delivery_rate_id: number | null;
+  from_branch: string | null;
+  to_district: string | null;
+  to_city: string | null;
+  weight_grams: number;
+  billable_weight_kg: number;
+  first_kg_charge: number | string;
+  additional_kg_charge: number | string;
+  cp_rates: number | string;
+  shipping_total: number | string;
+}
+
+export interface ApiDeliveryRateQuoteResponse {
+  delivery: ApiDeliveryRateQuote;
+  subtotal: number | string;
+  discount_total: number | string;
+  cart_total: number | string;
+  grand_total: number | string;
+}
+
+export interface ApiDeliveryRateOptions {
+  branches: string[];
+  selected_branch: string | null;
+  districts: string[];
+  cities: ApiDeliveryRateCity[];
+}

@@ -5,6 +5,8 @@ import {
   ApiCart,
   ApiCategory,
   ApiCheckoutRedirect,
+  ApiDeliveryRateOptions,
+  ApiDeliveryRateQuoteResponse,
   ApiOrder,
   ApiPaymentMethod,
   ApiProduct,
@@ -54,13 +56,13 @@ export const clearCart = (payload: { session_id?: string }) =>
 export const mergeCart = (payload: { session_id: string }) =>
   apiFetch<{ message: string; cart: ApiCart }>("/cart/merge", { method: "POST", json: payload });
 
-export const createPayment = (payload: Record<string, unknown>) =>
+export const createPayment = (payload: Record<string, unknown> | FormData) =>
   apiFetch<{ message: string; payment: { id: number }; checkout?: ApiCheckoutRedirect }>("/checkout/payments", {
     method: "POST",
     json: payload,
   });
 
-export const placeOrder = (payload: Record<string, unknown>) =>
+export const placeOrder = (payload: Record<string, unknown> | FormData) =>
   apiFetch<{ message: string; order: ApiOrder }>("/checkout/orders", {
     method: "POST",
     json: payload,
@@ -80,3 +82,17 @@ export const socialLogin = (
             json: payload,
         }
     );
+
+export const getDeliveryRateOptions = (branch?: string, district?: string) => {
+  const params = new URLSearchParams();
+  if (branch) params.set("branch", branch);
+  if (district) params.set("district", district);
+  const query = params.toString();
+  return apiFetch<ApiDeliveryRateOptions>(`/delivery-rates/options${query ? `?${query}` : ""}`);
+};
+
+export const getDeliveryQuote = (payload: Record<string, unknown>) =>
+  apiFetch<ApiDeliveryRateQuoteResponse>("/delivery-rates/quote", {
+    method: "POST",
+    json: payload,
+  });
