@@ -19,12 +19,14 @@ export default function ShopPage() {
   const [searchParams, setSearchParams] = useSearchParams();
   const initialCategory = searchParams.get("category") as ProductCategory | null;
   const initialSearch = searchParams.get("search") || "";
+  const filterNewArrivals = searchParams.get("filter") === "new-arrivals";
+  const initialSort = searchParams.get("sort") === "newest" || filterNewArrivals ? "newest" : "popularity";
   const filterDeals = searchParams.get("filter") === "deals";
 
   const [search, setSearch] = useState(initialSearch);
   const [category, setCategory] = useState<ProductCategory | "">(initialCategory || "");
   const [brand, setBrand] = useState("");
-  const [sort, setSort] = useState("popularity");
+  const [sort, setSort] = useState(initialSort);
   const [priceRange, setPriceRange] = useState<[number, number]>([0, 0]);
   const [view, setView] = useState<"grid" | "list">("grid");
   const [page, setPage] = useState(1);
@@ -48,7 +50,11 @@ export default function ShopPage() {
   }, [maxPrice]);
 
   const filtered = useMemo(() => {
-    let result = [...products];
+    let result = filterNewArrivals
+      ? [...products]
+          .sort((a, b) => new Date(b.updatedAt || b.createdAt || 0).getTime() - new Date(a.updatedAt || a.createdAt || 0).getTime())
+          .slice(0, 100)
+      : [...products];
     if (search) {
       const q = search.toLowerCase();
       result = result.filter((p) =>
@@ -67,13 +73,13 @@ export default function ShopPage() {
     switch (sort) {
       case "price-low": result.sort((a, b) => a.price - b.price); break;
       case "price-high": result.sort((a, b) => b.price - a.price); break;
-      case "newest": result.sort((a, b) => new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime()); break;
+      case "newest": result.sort((a, b) => new Date(b.updatedAt || b.createdAt || 0).getTime() - new Date(a.updatedAt || a.createdAt || 0).getTime()); break;
       case "rating": result.sort((a, b) => (b.rating || 0) - (a.rating || 0)); break;
       case "discount": result.sort((a, b) => (b.discount || 0) - (a.discount || 0)); break;
       default: result.sort((a, b) => (b.reviewCount || 0) - (a.reviewCount || 0));
     }
     return result;
-  }, [products, search, category, brand, sort, priceRange, filterDeals]);
+  }, [products, search, category, brand, sort, priceRange, filterDeals, filterNewArrivals]);
 
   const totalPages = Math.ceil(filtered.length / ITEMS_PER_PAGE);
   const paginated = filtered.slice((page - 1) * ITEMS_PER_PAGE, page * ITEMS_PER_PAGE);
@@ -83,7 +89,7 @@ export default function ShopPage() {
     setSearchParams({});
   };
 
-  const activeFilterCount = [search, category, brand, filterDeals].filter(Boolean).length + (priceRange[0] > 0 || (maxPrice > 0 && priceRange[1] < maxPrice) ? 1 : 0);
+  const activeFilterCount = [search, category, brand, filterDeals, filterNewArrivals].filter(Boolean).length + (priceRange[0] > 0 || (maxPrice > 0 && priceRange[1] < maxPrice) ? 1 : 0);
 
   if (isLoading && products.length === 0) {
     return (
@@ -102,7 +108,7 @@ export default function ShopPage() {
         <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 mb-8">
           <div>
             <h1 className="font-display text-3xl font-bold">
-              {filterDeals ? "🔥 Hot Deals" : category ? categoryList.find((c) => c.id === category)?.name : "All Products"}
+              {filterDeals ? "🔥 Hot Deals" : filterNewArrivals ? "New Arrivals" : category ? categoryList.find((c) => c.id === category)?.name : "All Products"}
             </h1>
             <p className="text-muted-foreground mt-1">{filtered.length} products found</p>
           </div>
