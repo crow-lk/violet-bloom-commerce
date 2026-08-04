@@ -21,6 +21,7 @@ export interface Product {
   isTrending?: boolean;
   isNewArrival?: boolean;
   createdAt?: string;
+  updatedAt?: string;
   defaultVariantId?: string;
   variantSku?: string;
   inquiryOnly?: boolean;

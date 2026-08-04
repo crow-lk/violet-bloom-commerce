@@ -73,6 +73,7 @@ export function mapProduct(
     isTrending: isTrending || highlightText.includes("trending"),
     isNewArrival: isRecent(product.created_at),
     createdAt: product.created_at || product.updated_at || new Date().toISOString(),
+    updatedAt: product.updated_at || product.created_at || new Date().toISOString(),
     defaultVariantId: variant ? String(variant.id) : undefined,
     variantSku: variant?.sku,
     inquiryOnly: product.inquiry_only || false,
