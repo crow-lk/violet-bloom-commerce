@@ -53,7 +53,7 @@ export default function ShopPage() {
     let result = filterNewArrivals
       ? [...products]
           .sort((a, b) => new Date(b.updatedAt || b.createdAt || 0).getTime() - new Date(a.updatedAt || a.createdAt || 0).getTime())
-          .slice(0, 100)
+          .slice(0, 50)
       : [...products];
     if (search) {
       const q = search.toLowerCase();
