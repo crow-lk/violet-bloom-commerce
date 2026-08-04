@@ -155,7 +155,11 @@ export default function Index() {
   const fallbackTrending = trending.length ? trending : products.slice(0, 8);
   const fallbackDeals = deals.length ? deals : products.slice(0, 4);
   const [currentSlide, setCurrentSlide] = useState(0);
+  const [newArrivalsIdx, setNewArrivalsIdx] = useState(0);
   const [carouselIdx, setCarouselIdx] = useState(0);
+  const newArrivals = [...products]
+    .sort((a, b) => new Date(b.updatedAt || b.createdAt || 0).getTime() - new Date(a.updatedAt || a.createdAt || 0).getTime())
+    .slice(0, 100);
   const carouselProducts = fallbackTrending.slice(0, 8);
   const categoryList = categories.length
     ? categories.map((cat) => ({ id: cat.slug, name: cat.name, icon: cat.slug }))
@@ -288,6 +292,46 @@ export default function Index() {
           </Button>
         </div>
       </section> */}
+
+      {/* New Arrivals Carousel */}
+      <section className="py-16 bg-muted/50">
+        <div className="container mx-auto px-4">
+          <div className="flex items-center justify-between mb-8">
+            <div className="flex items-center gap-3">
+              <Sparkles className="h-7 w-7 text-primary" />
+              <div>
+                <h2 className="font-display text-3xl font-bold">New Arrivals</h2>
+                <p className="text-muted-foreground mt-1">Our latest products</p>
+              </div>
+            </div>
+            <div className="flex gap-2">
+              <Button size="icon" variant="outline" onClick={() => setNewArrivalsIdx(Math.max(0, newArrivalsIdx - 1))} disabled={newArrivalsIdx === 0}>
+                <ChevronLeft className="h-4 w-4" />
+              </Button>
+              <Button
+                size="icon"
+                variant="outline"
+                onClick={() => setNewArrivalsIdx(Math.min(Math.max(0, newArrivals.length - 4), newArrivalsIdx + 1))}
+                disabled={newArrivalsIdx >= Math.max(0, newArrivals.length - 4)}
+              >
+                <ChevronRight className="h-4 w-4" />
+              </Button>
+            </div>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {newArrivals.slice(newArrivalsIdx, newArrivalsIdx + 4).map((p, i) => (
+              <motion.div
+                key={p.id}
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: i * 0.1 }}
+              >
+                <ProductCard product={p} />
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
 
       {/* Categories Sidebar + Featured Content */}
       <section className="py-16">
