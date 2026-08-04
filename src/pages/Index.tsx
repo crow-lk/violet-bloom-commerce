@@ -161,7 +161,7 @@ export default function Index() {
   const [carouselIdx, setCarouselIdx] = useState(0);
   const latestProducts = [...products]
     .sort((a, b) => new Date(b.updatedAt || b.createdAt || 0).getTime() - new Date(a.updatedAt || a.createdAt || 0).getTime())
-    .slice(0, 100);
+    .slice(0, 50);
   const newArrivals = getRotatingProducts(latestProducts, 4, newArrivalsRotationBucket, 47);
   const carouselProducts = fallbackTrending.slice(0, 8);
   const categoryList = categories.length
