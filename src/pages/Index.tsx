@@ -323,11 +323,15 @@ export default function Index() {
                 <p className="text-muted-foreground mt-1">Our latest products</p>
               </div>
             </div>
+            <Link to="/shop?filter=new-arrivals" className="text-primary text-sm font-medium hover:underline flex items-center gap-1">
+              View All <ArrowRight className="h-4 w-4" />
+            </Link>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {newArrivals.map((p, i) => (
               <motion.div
                 key={p.id}
+                className={i === 0 ? undefined : "hidden sm:block"}
                 initial={{ opacity: 0, x: 20 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: i * 0.1 }}
