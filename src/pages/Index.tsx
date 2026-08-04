@@ -111,8 +111,10 @@ function CountdownTimer() {
 }
 
 const PRODUCT_ROTATION_INTERVAL_MS = 15 * 60 * 1000;
+const NEW_ARRIVALS_ROTATION_INTERVAL_MS = 5 * 60 * 1000;
 
 const getRotationBucket = () => Math.floor(Date.now() / PRODUCT_ROTATION_INTERVAL_MS);
+const getNewArrivalsRotationBucket = () => Math.floor(Date.now() / NEW_ARRIVALS_ROTATION_INTERVAL_MS);
 
 function getRotatingProducts(items: Product[], count: number, rotationBucket: number, seedOffset: number): Product[] {
   let seed = rotationBucket + seedOffset;
@@ -133,6 +135,7 @@ function getRotatingProducts(items: Product[], count: number, rotationBucket: nu
 export default function Index() {
   const { products, categories } = useCatalog();
   const [rotationBucket, setRotationBucket] = useState(getRotationBucket);
+  const [newArrivalsRotationBucket, setNewArrivalsRotationBucket] = useState(getNewArrivalsRotationBucket);
   const featuredCandidates = products.filter((p) => p.isFeatured);
   const trendingCandidates = products.filter((p) => p.isTrending);
   const featured = getRotatingProducts(
@@ -155,11 +158,11 @@ export default function Index() {
   const fallbackTrending = trending.length ? trending : products.slice(0, 8);
   const fallbackDeals = deals.length ? deals : products.slice(0, 4);
   const [currentSlide, setCurrentSlide] = useState(0);
-  const [newArrivalsIdx, setNewArrivalsIdx] = useState(0);
   const [carouselIdx, setCarouselIdx] = useState(0);
-  const newArrivals = [...products]
+  const latestProducts = [...products]
     .sort((a, b) => new Date(b.updatedAt || b.createdAt || 0).getTime() - new Date(a.updatedAt || a.createdAt || 0).getTime())
     .slice(0, 100);
+  const newArrivals = getRotatingProducts(latestProducts, 4, newArrivalsRotationBucket, 47);
   const carouselProducts = fallbackTrending.slice(0, 8);
   const categoryList = categories.length
     ? categories.map((cat) => ({ id: cat.slug, name: cat.name, icon: cat.slug }))
@@ -185,6 +188,22 @@ export default function Index() {
       setRotationBucket(getRotationBucket());
       interval = setInterval(() => setRotationBucket(getRotationBucket()), PRODUCT_ROTATION_INTERVAL_MS);
     }, PRODUCT_ROTATION_INTERVAL_MS - (Date.now() % PRODUCT_ROTATION_INTERVAL_MS));
+
+    return () => {
+      clearTimeout(timeout);
+      clearInterval(interval);
+    };
+  }, []);
+
+  useEffect(() => {
+    let interval: ReturnType<typeof setInterval>;
+    const timeout = setTimeout(() => {
+      setNewArrivalsRotationBucket(getNewArrivalsRotationBucket());
+      interval = setInterval(
+        () => setNewArrivalsRotationBucket(getNewArrivalsRotationBucket()),
+        NEW_ARRIVALS_ROTATION_INTERVAL_MS
+      );
+    }, NEW_ARRIVALS_ROTATION_INTERVAL_MS - (Date.now() % NEW_ARRIVALS_ROTATION_INTERVAL_MS));
 
     return () => {
       clearTimeout(timeout);
@@ -304,22 +323,9 @@ export default function Index() {
                 <p className="text-muted-foreground mt-1">Our latest products</p>
               </div>
             </div>
-            <div className="flex gap-2">
-              <Button size="icon" variant="outline" onClick={() => setNewArrivalsIdx(Math.max(0, newArrivalsIdx - 1))} disabled={newArrivalsIdx === 0}>
-                <ChevronLeft className="h-4 w-4" />
-              </Button>
-              <Button
-                size="icon"
-                variant="outline"
-                onClick={() => setNewArrivalsIdx(Math.min(Math.max(0, newArrivals.length - 4), newArrivalsIdx + 1))}
-                disabled={newArrivalsIdx >= Math.max(0, newArrivals.length - 4)}
-              >
-                <ChevronRight className="h-4 w-4" />
-              </Button>
-            </div>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {newArrivals.slice(newArrivalsIdx, newArrivalsIdx + 4).map((p, i) => (
+            {newArrivals.map((p, i) => (
               <motion.div
                 key={p.id}
                 initial={{ opacity: 0, x: 20 }}
