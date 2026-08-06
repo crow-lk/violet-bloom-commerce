@@ -14,6 +14,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
 import SocialLoginButtons from "@/components/auth/SocialLoginButtons";
 import PhoneNumberModal from "@/components/auth/PhoneNumberModal";
+import OrderHistory from "@/components/account/OrderHistory";
 
 export default function AccountPage() {
   const { wishlist } = useWishlist();
@@ -289,11 +290,7 @@ const savePhone = async (phone: string) => {
           <TabsContent value="orders" className="mt-6">
             <div className="glass rounded-xl p-6">
               <h2 className="font-display text-xl font-semibold mb-4">Order History</h2>
-              <div className="text-center py-8">
-                <Package className="h-12 w-12 mx-auto text-muted-foreground mb-3" />
-                <p className="text-muted-foreground">Order history will appear here once the backend provides an orders endpoint.</p>
-                <Button asChild className="mt-4"><Link to="/shop">Start Shopping</Link></Button>
-              </div>
+              <OrderHistory />
             </div>
           </TabsContent>
 
