@@ -8,6 +8,8 @@ import {
   ApiDeliveryRateOptions,
   ApiDeliveryRateQuoteResponse,
   ApiOrder,
+  ApiAccountOrder,
+  ApiOrderTracking,
   ApiPaymentMethod,
   ApiProduct,
   ApiSettingsHeroImage,
@@ -67,6 +69,12 @@ export const placeOrder = (payload: Record<string, unknown> | FormData) =>
     method: "POST",
     json: payload,
   });
+
+export const getAccountOrders = () =>
+  apiFetch<{ data: ApiAccountOrder[] }>("/account/orders");
+
+export const getAccountOrderTracking = (orderId: number) =>
+  apiFetch<ApiOrderTracking>(`/account/orders/${orderId}/tracking`);
 
 export const socialLogin = (
     provider: "google" | "facebook",

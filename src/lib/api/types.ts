@@ -146,6 +146,29 @@ export interface ApiOrder {
   created_at?: string;
 }
 
+export interface ApiAccountOrderItem {
+  id: number;
+  product_name: string;
+  variant_name?: string | null;
+  sku?: string | null;
+  quantity: number;
+  unit_price: number | string;
+  line_total: number | string;
+}
+
+export interface ApiAccountOrder extends ApiOrder {
+  waybill?: string | null;
+  payment_method?: string | null;
+  items: ApiAccountOrderItem[];
+}
+
+export interface ApiOrderTracking {
+  order_id: number;
+  order_number: string;
+  waybill: string;
+  tracking: unknown;
+}
+
 export interface ApiAuthResponse {
   token: string;
   user: ApiUser;
