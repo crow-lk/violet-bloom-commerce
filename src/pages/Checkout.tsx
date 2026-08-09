@@ -456,7 +456,7 @@ export default function CheckoutPage() {
                 <div className="flex justify-between text-sm"><span className="text-muted-foreground">Tax</span><span>{formatPrice(taxTotal)}</span></div>
               )}
               <div className="flex justify-between text-sm">
-                <span className="text-muted-foreground">Shipping</span>
+                <span className="text-muted-foreground">Shipping (Delivery Fee + Packaging)</span>
                 <span>{isQuoteLoading ? "Calculating..." : isDeliveryQuoteReady ? shippingTotal > 0 ? formatPrice(shippingTotal) : <span className="text-success">Free</span> : "Select a city"}</span>
               </div>
               <div className="border-t border-border pt-2 flex justify-between"><span className="font-display font-bold text-lg">Total</span><span className="font-display font-bold text-lg text-primary">{formatPrice(grandTotal)}</span></div>
