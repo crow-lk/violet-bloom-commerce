@@ -297,13 +297,13 @@ export default function CheckoutPage() {
 
   return (
     <Layout>
-      <div className="container mx-auto px-4 py-8">
+      <div className="container mx-auto w-full max-w-screen-2xl overflow-x-hidden px-4 py-8">
         <h1 className="font-display text-3xl font-bold mb-8">Checkout</h1>
 
-        <form onSubmit={handlePlaceOrder} className="grid lg:grid-cols-3 gap-8">
+        <form onSubmit={handlePlaceOrder} className="grid min-w-0 grid-cols-1 gap-8 lg:grid-cols-3">
           {/* Shipping Info */}
-          <div className="lg:col-span-2 space-y-6">
-            <div className="glass rounded-xl p-6">
+          <div className="min-w-0 space-y-6 lg:col-span-2">
+            <div className="glass min-w-0 rounded-xl p-4 sm:p-6">
               <h2 className="font-display text-xl font-semibold mb-4">Shipping Information</h2>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
@@ -379,7 +379,7 @@ export default function CheckoutPage() {
             </div>
 
             {/* Payment */}
-            <div className="glass rounded-xl p-6">
+            <div className="glass min-w-0 rounded-xl p-4 sm:p-6">
               <h2 className="font-display text-xl font-semibold mb-4">Payment Method</h2>
               {activeMethods.length === 0 ? (
                 <p className="text-sm text-muted-foreground">No payment methods available.</p>
@@ -388,10 +388,10 @@ export default function CheckoutPage() {
                   {activeMethods.map((method) => (
                     <div key={method.id} className="space-y-2">
                       <label
-                        className={`flex items-center gap-3 p-4 rounded-lg border cursor-pointer transition-colors ${paymentMethodId === String(method.id) ? "border-primary bg-primary/5" : "border-border"}`}
+                        className={`flex min-w-0 items-center gap-3 rounded-lg border p-4 cursor-pointer transition-colors ${paymentMethodId === String(method.id) ? "border-primary bg-primary/5" : "border-border"}`}
                       >
                         <RadioGroupItem value={String(method.id)} />
-                        <div className="flex-1">
+                        <div className="min-w-0 flex-1">
                           <p className="font-medium">{method.name}</p>
                           {method.description && <p className="text-xs text-muted-foreground">{method.description}</p>}
                         </div>
@@ -433,7 +433,7 @@ export default function CheckoutPage() {
           </div>
 
           {/* Order Summary */}
-          <div className="glass rounded-xl p-6 h-fit sticky top-24">
+          <div className="glass min-w-0 rounded-xl p-4 sm:p-6 h-fit lg:sticky lg:top-24">
             <h2 className="font-display text-xl font-bold mb-4">Order Summary</h2>
             <div className="space-y-3 max-h-64 overflow-y-auto">
               {items.map((item) => (
@@ -455,9 +455,9 @@ export default function CheckoutPage() {
               {taxTotal > 0 && (
                 <div className="flex justify-between text-sm"><span className="text-muted-foreground">Tax</span><span>{formatPrice(taxTotal)}</span></div>
               )}
-              <div className="flex justify-between text-sm">
-                <span className="text-muted-foreground">Shipping (Delivery Fee + Packaging)</span>
-                <span>{isQuoteLoading ? "Calculating..." : isDeliveryQuoteReady ? shippingTotal > 0 ? formatPrice(shippingTotal) : <span className="text-success">Free</span> : "Select a city"}</span>
+              <div className="flex items-start justify-between gap-3 text-sm">
+                <span className="min-w-0 text-muted-foreground">Shipping (Delivery Fee + Packaging)</span>
+                <span className="shrink-0 text-right">{isQuoteLoading ? "Calculating..." : isDeliveryQuoteReady ? shippingTotal > 0 ? formatPrice(shippingTotal) : <span className="text-success">Free</span> : "Select a city"}</span>
               </div>
               <div className="border-t border-border pt-2 flex justify-between"><span className="font-display font-bold text-lg">Total</span><span className="font-display font-bold text-lg text-primary">{formatPrice(grandTotal)}</span></div>
             </div>
