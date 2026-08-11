@@ -52,37 +52,37 @@ export default function CartPage() {
 
   return (
     <Layout>
-      <div className="container mx-auto px-4 py-8">
-        <h1 className="font-display text-3xl font-bold mb-8">Shopping Cart ({itemCount} items)</h1>
+      <div className="container mx-auto w-full max-w-screen-2xl overflow-x-hidden px-4 py-8">
+        <h1 className="mb-8 break-words font-display text-2xl font-bold sm:text-3xl">Shopping Cart ({itemCount} items)</h1>
 
-        <div className="grid lg:grid-cols-3 gap-8">
+        <div className="grid min-w-0 grid-cols-1 gap-8 lg:grid-cols-3">
           {/* Cart Items */}
-          <div className="lg:col-span-2 space-y-4">
+          <div className="min-w-0 space-y-4 lg:col-span-2">
             <AnimatePresence>
               {items.map((item) => (
                 <motion.div
                   key={item.id}
                   layout
                   exit={{ opacity: 0, x: -100 }}
-                  className="glass rounded-xl p-4 flex gap-4"
+                  className="glass flex min-w-0 gap-3 rounded-xl p-3 sm:gap-4 sm:p-4"
                 >
-                  <Link to={item.productSlug ? `/product/${item.productSlug}` : "/shop"} className="w-24 h-24 flex-shrink-0">
+                  <Link to={item.productSlug ? `/product/${item.productSlug}` : "/shop"} className="h-20 w-20 flex-shrink-0 sm:h-24 sm:w-24">
                     <img src={item.imageUrl || "/placeholder.svg"} alt={item.productName} className="w-full h-full object-cover rounded-lg" />
                   </Link>
-                  <div className="flex-1">
-                    <div className="flex justify-between">
-                      <div>
+                  <div className="min-w-0 flex-1">
+                    <div className="flex min-w-0 justify-between gap-2">
+                      <div className="min-w-0">
                         <Link to={item.productSlug ? `/product/${item.productSlug}` : "/shop"}>
-                          <h3 className="font-display font-semibold hover:text-primary transition-colors">{item.productName}</h3>
+                          <h3 className="break-words font-display font-semibold transition-colors hover:text-primary">{item.productName}</h3>
                         </Link>
-                        {item.brand && <p className="text-sm text-muted-foreground">{item.brand}</p>}
+                        {item.brand && <p className="break-words text-sm text-muted-foreground">{item.brand}</p>}
                       </div>
-                      <Button variant="ghost" size="icon" onClick={() => removeItem(item.id)}>
+                      <Button className="shrink-0" variant="ghost" size="icon" onClick={() => removeItem(item.id)}>
                         <Trash2 className="h-4 w-4 text-destructive" />
                       </Button>
                     </div>
-                    <div className="flex items-center justify-between mt-3">
-                      <div className="flex items-center glass rounded-lg">
+                    <div className="mt-3 flex flex-wrap items-center justify-between gap-2">
+                      <div className="glass flex shrink-0 items-center rounded-lg">
                         <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => updateQuantity(item.id, item.quantity - 1)}>
                           <Minus className="h-3 w-3" />
                         </Button>
@@ -91,7 +91,7 @@ export default function CartPage() {
                           <Plus className="h-3 w-3" />
                         </Button>
                       </div>
-                      <span className="font-display font-bold text-primary">{formatPrice(item.lineTotal)}</span>
+                      <span className="break-all text-right font-display font-bold text-primary">{formatPrice(item.lineTotal)}</span>
                     </div>
                   </div>
                 </motion.div>
@@ -119,7 +119,7 @@ export default function CartPage() {
             )}
 
           {/* Order Summary */}
-          <div className="glass rounded-xl p-6 h-fit sticky top-24">
+          <div className="glass min-w-0 rounded-xl p-4 sm:p-6 h-fit lg:sticky lg:top-24">
             <h2 className="font-display text-xl font-bold mb-4">Order Summary</h2>
 
             <div className="space-y-3">

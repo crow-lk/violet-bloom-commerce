@@ -46,9 +46,9 @@ export default function Navbar() {
 
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
-          <Link to="/" className="flex items-center gap-2">
+          <Link to="/" className="flex shrink-0 items-center gap-2">
             <img src={logo} alt="ChuttakPay" className="h-10 w-10 rounded-lg object-cover" />
-            <span className="font-display text-xl font-bold text-gradient-purple">ChuttakPay</span>
+            <span className="hidden font-display text-xl font-bold text-gradient-purple sm:inline">ChuttakPay</span>
           </Link>
 
           {/* Desktop Nav */}
@@ -60,7 +60,7 @@ export default function Navbar() {
           </nav>
 
           {/* Actions */}
-          <div className="flex items-center gap-2">
+          <div className="flex min-w-0 items-center gap-1 sm:gap-2">
             {/* Search */}
             <AnimatePresence>
               {searchOpen && (
