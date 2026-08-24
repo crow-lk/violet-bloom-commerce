@@ -1,9 +1,10 @@
 import { useState, useEffect } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
-import { ChevronLeft, ChevronRight, Star, ShoppingCart, Heart, Minus, Plus, Truck, Shield, RotateCcw } from "lucide-react";
+import { ChevronLeft, ChevronRight, Star, ShoppingCart, Heart, Minus, Plus, Truck, Shield, RotateCcw, ZoomIn } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import Layout from "@/components/layout/Layout";
 import ProductCard from "@/components/products/ProductCard";
 import { formatPrice } from "@/lib/format";
@@ -29,6 +30,7 @@ export default function ProductDetailPage() {
   const [quantity, setQuantity] = useState(1);
   const [carouselIdx, setCarouselIdx] = useState(0);
   const [imageDirection, setImageDirection] = useState(1);
+  const [isLightboxOpen, setIsLightboxOpen] = useState(false);
 
   const handleBuyNow = async () => {
     await addItem(product, quantity);
@@ -47,7 +49,27 @@ export default function ProductDetailPage() {
     window.scrollTo({ top: 0, behavior: "instant" });
     setSelectedImage(0);
     setImageDirection(1);
+    setIsLightboxOpen(false);
   }, [slug]);
+
+  useEffect(() => {
+    if (!isLightboxOpen || !product?.images.length) return;
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "ArrowLeft") {
+        setImageDirection(-1);
+        setSelectedImage((current) => (current - 1 + product.images.length) % product.images.length);
+      }
+
+      if (event.key === "ArrowRight") {
+        setImageDirection(1);
+        setSelectedImage((current) => (current + 1) % product.images.length);
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [isLightboxOpen, product?.images.length]);
 
   if (isLoading) {
     return (
@@ -117,7 +139,17 @@ export default function ProductDetailPage() {
                   drag="x"
                   dragConstraints={{ left: 0, right: 0 }}
                 >
-                  <img src={product.images[selectedImage]} alt={product.name} className="w-full h-full object-cover" />
+                  <button
+                    type="button"
+                    onClick={() => setIsLightboxOpen(true)}
+                    className="group relative block h-full w-full cursor-zoom-in focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-inset"
+                    aria-label={`Open image ${selectedImage + 1} of ${product.images.length} in full screen`}
+                  >
+                    <img src={product.images[selectedImage]} alt={product.name} className="w-full h-full object-cover" />
+                    <span className="absolute bottom-3 right-3 flex h-10 w-10 items-center justify-center rounded-full bg-black/55 text-white opacity-100 backdrop-blur-sm transition-opacity sm:opacity-0 sm:group-hover:opacity-100 sm:group-focus-visible:opacity-100">
+                      <ZoomIn className="h-5 w-5" />
+                    </span>
+                  </button>
                 </motion.div>
               </AnimatePresence>
             </div>
@@ -285,6 +317,75 @@ export default function ProductDetailPage() {
             </div> */}
           </div>
         </div>
+
+        <Dialog open={isLightboxOpen} onOpenChange={setIsLightboxOpen}>
+          <DialogContent className="h-[100dvh] w-screen max-w-none gap-0 border-0 bg-black/95 p-0 text-white shadow-none sm:rounded-none [&>button]:right-4 [&>button]:top-4 [&>button]:z-20 [&>button]:flex [&>button]:h-11 [&>button]:w-11 [&>button]:items-center [&>button]:justify-center [&>button]:rounded-full [&>button]:bg-white/10 [&>button]:text-white [&>button]:opacity-100 [&>button]:backdrop-blur-sm [&>button_svg]:h-6 [&>button_svg]:w-6">
+            <DialogTitle className="sr-only">{product.name} image gallery</DialogTitle>
+
+            <div className="relative flex h-full min-h-0 items-center justify-center overflow-hidden px-4 py-16 sm:px-20">
+              <AnimatePresence initial={false} custom={imageDirection} mode="popLayout">
+                <motion.img
+                  key={selectedImage}
+                  src={product.images[selectedImage]}
+                  alt={`${product.name} — image ${selectedImage + 1} of ${product.images.length}`}
+                  custom={imageDirection}
+                  initial={{ opacity: 0, x: imageDirection > 0 ? 80 : -80 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: imageDirection > 0 ? -80 : 80 }}
+                  transition={{ duration: 0.22, ease: "easeInOut" }}
+                  drag={product.images.length > 1 ? "x" : false}
+                  dragConstraints={{ left: 0, right: 0 }}
+                  dragElastic={0.2}
+                  onDragEnd={(_, info) => {
+                    if (info.offset.x > 80) {
+                      setImageDirection(-1);
+                      setSelectedImage((current) => (current - 1 + product.images.length) % product.images.length);
+                    } else if (info.offset.x < -80) {
+                      setImageDirection(1);
+                      setSelectedImage((current) => (current + 1) % product.images.length);
+                    }
+                  }}
+                  className="max-h-full max-w-full select-none object-contain"
+                />
+              </AnimatePresence>
+
+              {product.images.length > 1 && (
+                <>
+                  <Button
+                    type="button"
+                    size="icon"
+                    variant="ghost"
+                    onClick={() => {
+                      setImageDirection(-1);
+                      setSelectedImage((current) => (current - 1 + product.images.length) % product.images.length);
+                    }}
+                    className="absolute left-3 top-1/2 z-10 h-12 w-12 -translate-y-1/2 rounded-full bg-white/10 text-white backdrop-blur-sm hover:bg-white/20 hover:text-white sm:left-6"
+                    aria-label="View previous image"
+                  >
+                    <ChevronLeft className="h-7 w-7" />
+                  </Button>
+                  <Button
+                    type="button"
+                    size="icon"
+                    variant="ghost"
+                    onClick={() => {
+                      setImageDirection(1);
+                      setSelectedImage((current) => (current + 1) % product.images.length);
+                    }}
+                    className="absolute right-3 top-1/2 z-10 h-12 w-12 -translate-y-1/2 rounded-full bg-white/10 text-white backdrop-blur-sm hover:bg-white/20 hover:text-white sm:right-6"
+                    aria-label="View next image"
+                  >
+                    <ChevronRight className="h-7 w-7" />
+                  </Button>
+                </>
+              )}
+
+              <div className="absolute bottom-5 left-1/2 z-10 -translate-x-1/2 rounded-full bg-black/50 px-3 py-1.5 text-sm tabular-nums backdrop-blur-sm">
+                {selectedImage + 1} / {product.images.length}
+              </div>
+            </div>
+          </DialogContent>
+        </Dialog>
 
         {/* Tabs */}
         <Tabs defaultValue="description" className="mt-8 sm:mt-12">
