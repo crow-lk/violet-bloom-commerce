@@ -14,13 +14,18 @@ import { motion, AnimatePresence } from "framer-motion";
 import { LAUNCH_MODE } from "@/config/launch";
 const ITEMS_PER_PAGE = 12;
 
+const compareNewest = (a: { id: string; createdAt?: string }, b: { id: string; createdAt?: string }) => {
+  const dateDifference = new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime();
+  return dateDifference || String(b.id).localeCompare(String(a.id), undefined, { numeric: true });
+};
+
 export default function ShopPage() {
   const { products, categories, brands, isLoading } = useCatalog();
   const [searchParams, setSearchParams] = useSearchParams();
   const initialCategory = searchParams.get("category") as ProductCategory | null;
   const initialSearch = searchParams.get("search") || "";
   const filterNewArrivals = searchParams.get("filter") === "new-arrivals";
-  const initialSort = searchParams.get("sort") === "newest" || filterNewArrivals ? "newest" : "popularity";
+  const initialSort = "newest";
   const filterDeals = searchParams.get("filter") === "deals";
 
   const [search, setSearch] = useState(initialSearch);
@@ -50,11 +55,7 @@ export default function ShopPage() {
   }, [maxPrice]);
 
   const filtered = useMemo(() => {
-    let result = filterNewArrivals
-      ? [...products]
-          .sort((a, b) => new Date(b.updatedAt || b.createdAt || 0).getTime() - new Date(a.updatedAt || a.createdAt || 0).getTime())
-          .slice(0, 50)
-      : [...products];
+    let result = [...products];
     if (search) {
       const q = search.toLowerCase();
       result = result.filter((p) =>
@@ -69,11 +70,12 @@ export default function ShopPage() {
     if (priceRange[1] > 0) {
       result = result.filter((p) => p.price >= priceRange[0] && p.price <= priceRange[1]);
     }
+    if (filterNewArrivals) result = result.sort(compareNewest).slice(0, 50);
 
     switch (sort) {
       case "price-low": result.sort((a, b) => a.price - b.price); break;
       case "price-high": result.sort((a, b) => b.price - a.price); break;
-      case "newest": result.sort((a, b) => new Date(b.updatedAt || b.createdAt || 0).getTime() - new Date(a.updatedAt || a.createdAt || 0).getTime()); break;
+      case "newest": result.sort(compareNewest); break;
       case "rating": result.sort((a, b) => (b.rating || 0) - (a.rating || 0)); break;
       case "discount": result.sort((a, b) => (b.discount || 0) - (a.discount || 0)); break;
       default: result.sort((a, b) => (b.reviewCount || 0) - (a.reviewCount || 0));
@@ -118,7 +120,7 @@ export default function ShopPage() {
               onChange={(v) => { setSearch(v); setPage(1); }}
               className="flex-1 md:w-64"
             />
-            <Select value={sort} onValueChange={setSort}>
+            <Select value={sort} onValueChange={(value) => { setSort(value); setPage(1); }}>
               <SelectTrigger className="w-40">
                 <SelectValue placeholder="Sort by" />
               </SelectTrigger>
