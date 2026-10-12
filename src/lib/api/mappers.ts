@@ -33,8 +33,13 @@ export function mapProduct(
   const brand = brands.find((b) => b.id === product.brand_id);
   const variant = pickDefaultVariant(product.variants || []);
   const price = toNumber(variant?.selling_price);
-  const originalPrice = variant?.mrp ? toNumber(variant.mrp) : undefined;
-  const discount = originalPrice && originalPrice > price ? Math.round(((originalPrice - price) / originalPrice) * 100) : undefined;
+  const originalPriceValue = variant?.original_price ?? variant?.mrp;
+  const originalPrice = originalPriceValue ? toNumber(originalPriceValue) : undefined;
+  const discount = product.is_flash_sale && product.flash_sale_discount_percent
+    ? Math.round(toNumber(product.flash_sale_discount_percent))
+    : originalPrice && originalPrice > price
+      ? Math.round(((originalPrice - price) / originalPrice) * 100)
+      : undefined;
   const inStock = (toNumber(variant?.quantity) || toNumber(product.quantity)) > 0 && product.status !== "inactive";
   const description = toText(product.description);
   const shortDescription = description ? (description.length > 90 ? `${description.slice(0, 87)}...` : description) : "";
@@ -78,6 +83,9 @@ export function mapProduct(
     variantSku: variant?.sku,
     inquiryOnly: product.inquiry_only || false,
     showPriceInquiryMode: product.show_price_inquiry_mode || false,
+    isFlashSale: product.is_flash_sale || false,
+    flashSaleStartsAt: product.flash_sale_starts_at || undefined,
+    flashSaleEndsAt: product.flash_sale_ends_at || undefined,
     variants: product.variants || [],
   };
 }

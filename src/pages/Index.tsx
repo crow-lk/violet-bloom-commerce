@@ -78,38 +78,6 @@ const heroSlides = [
   },
 ];
 
-function CountdownTimer() {
-  const [time, setTime] = useState({ hours: 5, minutes: 42, seconds: 18 });
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setTime((prev) => {
-        let { hours, minutes, seconds } = prev;
-        seconds--;
-        if (seconds < 0) { seconds = 59; minutes--; }
-        if (minutes < 0) { minutes = 59; hours--; }
-        if (hours < 0) return { hours: 23, minutes: 59, seconds: 59 };
-        return { hours, minutes, seconds };
-      });
-    }, 1000);
-    return () => clearInterval(interval);
-  }, []);
-  const pad = (n: number) => n.toString().padStart(2, "0");
-  return (
-    <div className="flex gap-2">
-      {[
-        { label: "HRS", value: pad(time.hours) },
-        { label: "MIN", value: pad(time.minutes) },
-        { label: "SEC", value: pad(time.seconds) },
-      ].map((t) => (
-        <div key={t.label} className="bg-background/20 backdrop-blur-sm rounded-lg px-3 py-2 text-center">
-          <p className="font-display text-2xl font-bold">{t.value}</p>
-          <p className="text-xs opacity-80">{t.label}</p>
-        </div>
-      ))}
-    </div>
-  );
-}
-
 const PRODUCT_ROTATION_INTERVAL_MS = 15 * 60 * 1000;
 const NEW_ARRIVALS_ROTATION_INTERVAL_MS = 5 * 60 * 1000;
 
@@ -154,6 +122,13 @@ export default function Index() {
     .filter((p) => (p.discount || 0) > 0)
     .sort((a, b) => (b.discount || 0) - (a.discount || 0))
     .slice(0, 4);
+  const flashSaleProducts = products
+    .filter((product) => product.isFlashSale)
+    .sort((a, b) => {
+      if (!a.flashSaleEndsAt) return 1;
+      if (!b.flashSaleEndsAt) return -1;
+      return new Date(a.flashSaleEndsAt).getTime() - new Date(b.flashSaleEndsAt).getTime();
+    });
   const fallbackFeatured = featured.length ? featured : products.slice(0, 6);
   const fallbackTrending = trending.length ? trending : products.slice(0, 8);
   const fallbackDeals = deals.length ? deals : products.slice(0, 4);
@@ -293,6 +268,43 @@ export default function Index() {
           ))}
         </div>
       </section>
+
+      {flashSaleProducts.length > 0 && (
+        <section className="border-t border-destructive/15 bg-gradient-to-br from-destructive/10 via-background to-primary/10 py-12">
+          <div className="container mx-auto px-4">
+            <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+              <div>
+                <Badge variant="destructive" className="mb-3 gap-1.5">
+                  <Flame className="h-3.5 w-3.5" /> Limited time
+                </Badge>
+                <div className="flex items-center gap-3">
+                  <Flame className="h-7 w-7 text-destructive" />
+                  <div>
+                    <h2 className="font-display text-3xl font-bold">Flash Sale</h2>
+                    <p className="mt-1 text-muted-foreground">Grab these deals before the countdown ends.</p>
+                  </div>
+                </div>
+              </div>
+              <Link to="/shop?filter=flash-sale" className="flex items-center gap-1 text-sm font-medium text-primary hover:underline">
+                View All Deals <ArrowRight className="h-4 w-4" />
+              </Link>
+            </div>
+            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+              {flashSaleProducts.slice(0, 4).map((product, index) => (
+                <motion.div
+                  key={product.id}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: index * 0.08 }}
+                >
+                  <ProductCard product={product} />
+                </motion.div>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
 
       {LAUNCH_MODE && <LaunchBanner />}
 

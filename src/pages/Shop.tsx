@@ -27,6 +27,7 @@ export default function ShopPage() {
   const filterNewArrivals = searchParams.get("filter") === "new-arrivals";
   const initialSort = "newest";
   const filterDeals = searchParams.get("filter") === "deals";
+  const filterFlashSale = searchParams.get("filter") === "flash-sale";
 
   const [search, setSearch] = useState(initialSearch);
   const [category, setCategory] = useState<ProductCategory | "">(initialCategory || "");
@@ -67,6 +68,7 @@ export default function ShopPage() {
     if (category) result = result.filter((p) => p.category === category);
     if (brand) result = result.filter((p) => p.brand === brand);
     if (filterDeals) result = result.filter((p) => p.discount && p.discount > 0);
+    if (filterFlashSale) result = result.filter((p) => p.isFlashSale);
     if (priceRange[1] > 0) {
       result = result.filter((p) => p.price >= priceRange[0] && p.price <= priceRange[1]);
     }
@@ -81,7 +83,7 @@ export default function ShopPage() {
       default: result.sort((a, b) => (b.reviewCount || 0) - (a.reviewCount || 0));
     }
     return result;
-  }, [products, search, category, brand, sort, priceRange, filterDeals, filterNewArrivals]);
+  }, [products, search, category, brand, sort, priceRange, filterDeals, filterFlashSale, filterNewArrivals]);
 
   const totalPages = Math.ceil(filtered.length / ITEMS_PER_PAGE);
   const paginated = filtered.slice((page - 1) * ITEMS_PER_PAGE, page * ITEMS_PER_PAGE);
@@ -91,7 +93,7 @@ export default function ShopPage() {
     setSearchParams({});
   };
 
-  const activeFilterCount = [search, category, brand, filterDeals, filterNewArrivals].filter(Boolean).length + (priceRange[0] > 0 || (maxPrice > 0 && priceRange[1] < maxPrice) ? 1 : 0);
+  const activeFilterCount = [search, category, brand, filterDeals, filterFlashSale, filterNewArrivals].filter(Boolean).length + (priceRange[0] > 0 || (maxPrice > 0 && priceRange[1] < maxPrice) ? 1 : 0);
 
   if (isLoading && products.length === 0) {
     return (
@@ -110,7 +112,7 @@ export default function ShopPage() {
         <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 mb-8">
           <div>
             <h1 className="font-display text-3xl font-bold">
-              {filterDeals ? "🔥 Hot Deals" : filterNewArrivals ? "New Arrivals" : category ? categoryList.find((c) => c.id === category)?.name : "All Products"}
+              {filterFlashSale ? "Flash Sale" : filterDeals ? "🔥 Hot Deals" : filterNewArrivals ? "New Arrivals" : category ? categoryList.find((c) => c.id === category)?.name : "All Products"}
             </h1>
             <p className="text-muted-foreground mt-1">{filtered.length} products found</p>
           </div>
