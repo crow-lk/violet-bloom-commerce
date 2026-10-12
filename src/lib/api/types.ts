@@ -43,6 +43,7 @@ export interface ApiVariant {
   quantity?: number | null;
   status?: "active" | "inactive";
   mrp?: number | null;
+  original_price?: number | null;
 }
 
 export interface ApiProduct {
@@ -64,6 +65,10 @@ export interface ApiProduct {
   quantity?: number | null;
   inquiry_only?: boolean;
   show_price_inquiry_mode?: boolean;
+  is_flash_sale?: boolean;
+  flash_sale_discount_percent?: number | null;
+  flash_sale_starts_at?: string | null;
+  flash_sale_ends_at?: string | null;
   variants: ApiVariant[];
   images: string[];
   highlights?: string[];

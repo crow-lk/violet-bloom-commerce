@@ -26,11 +26,15 @@ export interface Product {
   variantSku?: string;
   inquiryOnly?: boolean;
   showPriceInquiryMode?: boolean;
+  isFlashSale?: boolean;
+  flashSaleStartsAt?: string;
+  flashSaleEndsAt?: string;
   variants?: Array<{
     id: number;
     sku: string;
     size_name?: string | null;
     selling_price?: number | null;
+    original_price?: number | null;
     quantity?: number | null;
     status?: "active" | "inactive";
     color?: { id: number; name: string; hex?: string | null } | null;

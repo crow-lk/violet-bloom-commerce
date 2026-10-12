@@ -1,5 +1,6 @@
+import { useCallback, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { Heart, ShoppingCart, Star } from "lucide-react";
+import { Clock3, Heart, ShoppingCart, Star } from "lucide-react";
 import { Product } from "@/types/product";
 import { formatPrice } from "@/lib/format";
 import { useCart } from "@/contexts/CartContext";
@@ -15,6 +16,30 @@ interface ProductCardProps {
   view?: "grid" | "list";
 }
 
+function FlashSaleCountdown({ endsAt }: { endsAt: string }) {
+  const getRemaining = useCallback(() => Math.max(0, new Date(endsAt).getTime() - Date.now()), [endsAt]);
+  const [remaining, setRemaining] = useState(getRemaining);
+
+  useEffect(() => {
+    setRemaining(getRemaining());
+    const interval = setInterval(() => setRemaining(getRemaining()), 1000);
+    return () => clearInterval(interval);
+  }, [getRemaining]);
+
+  const days = Math.floor(remaining / 86_400_000);
+  const hours = Math.floor((remaining / 3_600_000) % 24);
+  const minutes = Math.floor((remaining / 60_000) % 60);
+  const seconds = Math.floor((remaining / 1000) % 60);
+  const value = `${days > 0 ? `${days}d ` : ""}${String(hours).padStart(2, "0")}:${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`;
+
+  return (
+    <div className="absolute inset-x-2 bottom-2 z-10 flex items-center justify-center gap-1.5 rounded-lg bg-destructive/90 px-2.5 py-2 text-xs font-semibold text-destructive-foreground shadow-md backdrop-blur-sm">
+      <Clock3 className="h-3.5 w-3.5" />
+      <span>Ends in {value}</span>
+    </div>
+  );
+}
+
 export default function ProductCard({ product, view = "grid" }: ProductCardProps) {
   const { addItem } = useCart();
   const { toggleWishlist, isInWishlist } = useWishlist();
@@ -28,8 +53,9 @@ export default function ProductCard({ product, view = "grid" }: ProductCardProps
         whileHover={{ y: -2 }}
         className="glass rounded-xl overflow-hidden flex gap-4 p-4"
       >
-        <Link to={`/product/${product.slug}`} className="w-40 h-40 flex-shrink-0">
+        <Link to={`/product/${product.slug}`} className="relative h-40 w-40 flex-shrink-0 overflow-hidden rounded-lg">
           <img src={product.images[0]} alt={product.name} className="w-full h-full object-cover rounded-lg" loading="lazy" />
+          {product.isFlashSale && product.flashSaleEndsAt && <FlashSaleCountdown endsAt={product.flashSaleEndsAt} />}
         </Link>
         <div className="flex-1 flex flex-col justify-between">
           <div>
@@ -90,7 +116,7 @@ export default function ProductCard({ product, view = "grid" }: ProductCardProps
   return (
     <motion.div
       whileHover={{ y: -4 }}
-      className="glass rounded-xl overflow-hidden group relative"
+      className="glass group relative flex h-full flex-col overflow-hidden rounded-xl"
     >
       {/* Badges */}
       <div className="absolute top-3 left-3 z-10 flex flex-col gap-1">
@@ -115,18 +141,19 @@ export default function ProductCard({ product, view = "grid" }: ProductCardProps
 
       {/* Image */}
       <Link to={`/product/${product.slug}`}>
-        <div className="aspect-square overflow-hidden">
+        <div className="relative aspect-square overflow-hidden">
           <img
             src={product.images[0]}
             alt={product.name}
             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
             loading="lazy"
           />
+          {product.isFlashSale && product.flashSaleEndsAt && <FlashSaleCountdown endsAt={product.flashSaleEndsAt} />}
         </div>
       </Link>
 
       {/* Info */}
-      <div className="p-4">
+      <div className="flex flex-1 flex-col p-4">
         <p className="text-xs text-muted-foreground uppercase tracking-wide">{product.brand}</p>
         <Link to={`/product/${product.slug}`}>
           <h3 className="font-display font-semibold mt-1 line-clamp-1 hover:text-primary transition-colors">{product.name}</h3>
@@ -145,7 +172,7 @@ export default function ProductCard({ product, view = "grid" }: ProductCardProps
           </div>
         )}
 
-        <div className="flex items-center justify-between mt-3">
+        <div className="mt-auto flex items-center justify-between pt-3">
           <div>
             <span className="font-display font-bold text-primary">
               {showPrice ? formatPrice(product.price) : "Contact for price"}
