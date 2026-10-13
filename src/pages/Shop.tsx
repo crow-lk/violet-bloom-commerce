@@ -112,7 +112,7 @@ export default function ShopPage() {
         <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 mb-8">
           <div>
             <h1 className="font-display text-3xl font-bold">
-              {filterFlashSale ? "Flash Sale" : filterDeals ? "🔥 Hot Deals" : filterNewArrivals ? "New Arrivals" : category ? categoryList.find((c) => c.id === category)?.name : "All Products"}
+              {filterFlashSale ? "Savior Pack" : filterDeals ? "🔥 Hot Deals" : filterNewArrivals ? "New Arrivals" : category ? categoryList.find((c) => c.id === category)?.name : "All Products"}
             </h1>
             <p className="text-muted-foreground mt-1">{filtered.length} products found</p>
           </div>

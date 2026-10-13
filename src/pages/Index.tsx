@@ -13,7 +13,7 @@ import ProductCard from "@/components/products/ProductCard";
 import Layout from "@/components/layout/Layout";
 import { useCatalog } from "@/hooks/useCatalog";
 import { CATEGORIES, Product } from "@/types/product";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import LaunchBanner from "@/components/launch/LaunchBanner";
 import { LAUNCH_MODE } from "@/config/launch";
 
@@ -158,6 +158,13 @@ export default function Index() {
   }, [nextSlide]);
 
   useEffect(() => {
+    heroSlides.forEach(({ image }) => {
+      const preloadedImage = new Image();
+      preloadedImage.src = image;
+    });
+  }, []);
+
+  useEffect(() => {
     let interval: ReturnType<typeof setInterval>;
     const timeout = setTimeout(() => {
       setRotationBucket(getRotationBucket());
@@ -194,62 +201,36 @@ export default function Index() {
     <Layout>
       {/* Hero Image Slider */}
       <section className="relative overflow-hidden h-[400px] md:h-[520px]">
-        <AnimatePresence mode="wait">
-          <motion.div
-            key={currentSlide}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.6 }}
-            className="absolute inset-0"
+        {heroSlides.map((slide, index) => (
+          <div
+            key={slide.image}
+            className={`absolute inset-0 transform-gpu transition-opacity duration-1000 ease-in-out will-change-[opacity] ${
+              index === currentSlide ? "opacity-100" : "pointer-events-none opacity-0"
+            }`}
+            aria-hidden={index !== currentSlide}
           >
             <img
-              src={heroSlides[currentSlide].image}
-              alt={heroSlides[currentSlide].title}
+              src={slide.image}
+              alt={slide.title}
+              loading="eager"
+              decoding="async"
               className="absolute inset-0 w-full h-full object-cover"
             />
             <div className="absolute inset-0 bg-gradient-to-r from-black/75 via-black/50 to-black/20" />
-            <div className="container mx-auto px-4 h-full flex items-center relative">
-              <div className="max-w-2xl">
-                <motion.div
-                  initial={{ opacity: 0, y: 30 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.3, duration: 0.5 }}
-                >
-                  <Badge className="bg-white/20 text-white border-0 mb-4 text-sm backdrop-blur-sm">
-                    {heroSlides[currentSlide].badge}
-                  </Badge>
-                  <h1 className="font-display text-4xl md:text-6xl font-bold text-white leading-tight drop-shadow-lg">
-                    {heroSlides[currentSlide].title}
-                  </h1>
-                  <p className="text-white/80 mt-4 text-lg md:text-xl drop-shadow">
-                    {heroSlides[currentSlide].subtitle}
-                  </p>
-                  <div className="flex gap-3 mt-8">
-                    <Button asChild size="lg" className="bg-white text-primary hover:bg-white/90 font-semibold shadow-lg">
-                      <Link to={heroSlides[currentSlide].link}>
-                        {heroSlides[currentSlide].cta} <ArrowRight className="ml-2 h-4 w-4" />
-                      </Link>
-                    </Button>
-                    <Button asChild size="lg" variant="outline" className="bg-transparent border-white/50 text-white hover:bg-white/20 hover:text-white backdrop-blur-sm">
-                      <Link to="/shop?filter=deals">All Deals</Link>
-                    </Button>
-                  </div>
-                </motion.div>
-              </div>
-            </div>
-          </motion.div>
-        </AnimatePresence>
+          </div>
+        ))}
 
         {/* Slider Controls */}
         <button
           onClick={prevSlide}
+          aria-label="Previous slide"
           className="absolute left-4 top-1/2 -translate-y-1/2 z-10 p-3 rounded-full bg-white/30 backdrop-blur-md text-white hover:bg-white/50 transition-all shadow-lg border border-white/20"
         >
           <ChevronLeft className="h-6 w-6" />
         </button>
         <button
           onClick={nextSlide}
+          aria-label="Next slide"
           className="absolute right-4 top-1/2 -translate-y-1/2 z-10 p-3 rounded-full bg-white/30 backdrop-blur-md text-white hover:bg-white/50 transition-all shadow-lg border border-white/20"
         >
           <ChevronRight className="h-6 w-6" />
@@ -261,6 +242,7 @@ export default function Index() {
             <button
               key={i}
               onClick={() => setCurrentSlide(i)}
+              aria-label={`Go to slide ${i + 1}`}
               className={`h-3 rounded-full transition-all shadow ${
                 i === currentSlide ? "bg-white w-10" : "bg-white/40 w-3 hover:bg-white/60"
               }`}
@@ -280,8 +262,8 @@ export default function Index() {
                 <div className="flex items-center gap-3">
                   <Flame className="h-7 w-7 text-destructive" />
                   <div>
-                    <h2 className="font-display text-3xl font-bold">Flash Sale</h2>
-                    <p className="mt-1 text-muted-foreground">Grab these deals before the countdown ends.</p>
+                    <h2 className="font-display text-3xl font-bold">Savior Pack</h2>
+                    <p className="mt-1 text-muted-foreground">Everyday essentials, ready to save the day.</p>
                   </div>
                 </div>
               </div>
