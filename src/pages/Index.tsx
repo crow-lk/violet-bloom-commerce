@@ -1,10 +1,9 @@
 import { useState, useEffect, useCallback } from "react";
 import { Link } from "react-router-dom";
 import { ArrowRight, Gem, Scissors, Sparkles, UtensilsCrossed, Home as HomeIcon, PenTool, Wrench, Baby, Coffee, SprayCan, ChevronLeft, ChevronRight, Mail, Star, Flame, TrendingUp, Gift } from "lucide-react";
-import heroDeals from "@/assets/hero-deals.jpg";
-import heroTrending from "@/assets/hero-trending.jpg";
-import heroHome from "@/assets/hero-home.jpg";
-import heroKids from "@/assets/hero-kids.jpg";
+import heroSaviorPack from "@/assets/hero-savior-pack-v2.png";
+import heroEverydayFinds from "@/assets/hero-everyday-finds.png";
+import hero1111Teaser from "@/assets/hero-11-11-teaser-v2.png";
 import cod from "@/assets/cod.png";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -44,6 +43,15 @@ const resolveCategoryIcon = (key: string) => CATEGORY_ICONS[key] || <Gem classNa
 
 // Hero Slider Data
 const heroSlides = [
+  {
+    title: "Savior Packs",
+    subtitle: "Everyday favorites bundled to save the day",
+    cta: "Shop Savior Packs",
+    link: "/shop?filter=flash-sale",
+    badge: "Limited-time picks",
+    image: heroSaviorPack,
+    embeddedText: true,
+  },
   // {
   //   title: "Discover Amazing Deals",
   //   subtitle: "Up to 33% OFF on Beauty & Care",
@@ -58,7 +66,7 @@ const heroSlides = [
     cta: "Explore Collection",
     link: "/shop?category=jewellery-fashion-accessories",
     badge: "✨ Trending",
-    image: heroTrending,
+    image: heroEverydayFinds,
   },
   {
     title: "Home Essentials",
@@ -66,7 +74,7 @@ const heroSlides = [
     cta: "Shop Home",
     link: "/shop?category=home-kitchen",
     badge: "🏠 New Arrivals",
-    image: heroHome,
+    image: hero1111Teaser,
   },
   {
     title: "Kids' Favorites",
@@ -74,8 +82,14 @@ const heroSlides = [
     cta: "Shop for Kids",
     link: "/shop?category=toys-kids-items",
     badge: "🎁 Gift Ideas",
-    image: heroKids,
+    image: heroSaviorPack,
   },
+];
+
+const activeHeroSlides = [
+  { title: "Savior Packs", image: heroSaviorPack },
+  { title: "Everyday Finds", image: heroEverydayFinds },
+  { title: "11.11 Offer Teaser", image: hero1111Teaser },
 ];
 
 const PRODUCT_ROTATION_INTERVAL_MS = 15 * 60 * 1000;
@@ -144,11 +158,11 @@ export default function Index() {
     : CATEGORIES;
 
   const nextSlide = useCallback(() => {
-    setCurrentSlide((prev) => (prev + 1) % heroSlides.length);
+    setCurrentSlide((prev) => (prev + 1) % activeHeroSlides.length);
   }, []);
 
   const prevSlide = useCallback(() => {
-    setCurrentSlide((prev) => (prev - 1 + heroSlides.length) % heroSlides.length);
+    setCurrentSlide((prev) => (prev - 1 + activeHeroSlides.length) % activeHeroSlides.length);
   }, []);
 
   // Auto-play slider
@@ -158,7 +172,7 @@ export default function Index() {
   }, [nextSlide]);
 
   useEffect(() => {
-    heroSlides.forEach(({ image }) => {
+    activeHeroSlides.forEach(({ image }) => {
       const preloadedImage = new Image();
       preloadedImage.src = image;
     });
@@ -200,8 +214,9 @@ export default function Index() {
   return (
     <Layout>
       {/* Hero Image Slider */}
-      <section className="relative overflow-hidden h-[400px] md:h-[520px]">
-        {heroSlides.map((slide, index) => (
+      <section className="container mx-auto px-4">
+        <div className="relative aspect-[2/1] overflow-hidden">
+          {activeHeroSlides.map((slide, index) => (
           <div
             key={slide.image}
             className={`absolute inset-0 transform-gpu transition-opacity duration-1000 ease-in-out will-change-[opacity] ${
@@ -216,19 +231,18 @@ export default function Index() {
               decoding="async"
               className="absolute inset-0 w-full h-full object-cover"
             />
-            <div className="absolute inset-0 bg-gradient-to-r from-black/75 via-black/50 to-black/20" />
           </div>
-        ))}
+          ))}
 
         {/* Slider Controls */}
-        <button
+          <button
           onClick={prevSlide}
           aria-label="Previous slide"
           className="absolute left-4 top-1/2 -translate-y-1/2 z-10 p-3 rounded-full bg-white/30 backdrop-blur-md text-white hover:bg-white/50 transition-all shadow-lg border border-white/20"
         >
           <ChevronLeft className="h-6 w-6" />
         </button>
-        <button
+          <button
           onClick={nextSlide}
           aria-label="Next slide"
           className="absolute right-4 top-1/2 -translate-y-1/2 z-10 p-3 rounded-full bg-white/30 backdrop-blur-md text-white hover:bg-white/50 transition-all shadow-lg border border-white/20"
@@ -237,8 +251,8 @@ export default function Index() {
         </button>
 
         {/* Slide Indicators */}
-        <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex gap-2 z-10">
-          {heroSlides.map((_, i) => (
+          <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2 z-10">
+          {activeHeroSlides.map((_, i) => (
             <button
               key={i}
               onClick={() => setCurrentSlide(i)}
@@ -248,6 +262,7 @@ export default function Index() {
               }`}
             />
           ))}
+          </div>
         </div>
       </section>
 
