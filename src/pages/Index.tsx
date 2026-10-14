@@ -1,9 +1,9 @@
 import { useState, useEffect, useCallback } from "react";
 import { Link } from "react-router-dom";
 import { ArrowRight, Gem, Scissors, Sparkles, UtensilsCrossed, Home as HomeIcon, PenTool, Wrench, Baby, Coffee, SprayCan, ChevronLeft, ChevronRight, Mail, Star, Flame, TrendingUp, Gift } from "lucide-react";
-import heroSaviorPack from "@/assets/hero-savior-pack-v2.png";
-import heroEverydayFinds from "@/assets/hero-everyday-finds.png";
-import hero1111Teaser from "@/assets/hero-11-11-teaser-v2.png";
+import heroSaviorPack from "@/assets/hero-savior-pack-v2.webp";
+import heroEverydayFinds from "@/assets/hero-everyday-finds.webp";
+import hero1111Teaser from "@/assets/hero-11-11-teaser-v2.webp";
 import cod from "@/assets/cod.png";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -94,6 +94,7 @@ const activeHeroSlides = [
 
 const PRODUCT_ROTATION_INTERVAL_MS = 15 * 60 * 1000;
 const NEW_ARRIVALS_ROTATION_INTERVAL_MS = 5 * 60 * 1000;
+const HERO_SLIDE_INTERVAL_MS = 8 * 1000;
 
 const getRotationBucket = () => Math.floor(Date.now() / PRODUCT_ROTATION_INTERVAL_MS);
 const getNewArrivalsRotationBucket = () => Math.floor(Date.now() / NEW_ARRIVALS_ROTATION_INTERVAL_MS);
@@ -167,7 +168,7 @@ export default function Index() {
 
   // Auto-play slider
   useEffect(() => {
-    const interval = setInterval(nextSlide, 5000);
+    const interval = setInterval(nextSlide, HERO_SLIDE_INTERVAL_MS);
     return () => clearInterval(interval);
   }, [nextSlide]);
 
