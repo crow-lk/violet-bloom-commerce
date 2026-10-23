@@ -88,10 +88,10 @@ const heroSlides = [
 ];
 
 const activeHeroSlides = [
+  { title: "3 Months Anniversary Mega Sale", image: heroAnniversaryMegaSale },
   { title: "Savior Packs", image: heroSaviorPack },
   { title: "Everyday Finds", image: heroEverydayFinds },
   // { title: "11.11 Offer Teaser", image: hero1111Teaser },
-  { title: "3 Months Anniversary Mega Sale", image: heroAnniversaryMegaSale },
 ];
 
 const PRODUCT_ROTATION_INTERVAL_MS = 15 * 60 * 1000;
