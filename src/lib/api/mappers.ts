@@ -64,6 +64,7 @@ export function mapProduct(
     price,
     originalPrice,
     discount,
+    discountName: variant?.discount_name || undefined,
     category: category?.slug || "uncategorized",
     categoryId: String(product.category_id),
     brand: brand?.name || "",

@@ -44,6 +44,8 @@ export interface ApiVariant {
   status?: "active" | "inactive";
   mrp?: number | null;
   original_price?: number | null;
+  discount_name?: string | null;
+  discount_percent?: number | null;
 }
 
 export interface ApiProduct {
@@ -159,9 +161,13 @@ export interface ApiAccountOrderItem {
   quantity: number;
   unit_price: number | string;
   line_total: number | string;
+  discount_name?: string | null;
+  original_unit_price?: number | null;
+  product_discount_total?: number;
 }
 
 export interface ApiAccountOrder extends ApiOrder {
+  product_discount_total?: number;
   waybill?: string | null;
   payment_method?: string | null;
   items: ApiAccountOrderItem[];

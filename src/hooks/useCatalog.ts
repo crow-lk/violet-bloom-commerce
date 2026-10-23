@@ -20,6 +20,7 @@ export function useCatalog() {
   const productsQuery = useQuery<ApiProduct[]>({
     queryKey: ["products"],
     queryFn: getProducts,
+    refetchInterval: 30_000,
   });
 
   const categories = fallbackArray(categoriesQuery.data);

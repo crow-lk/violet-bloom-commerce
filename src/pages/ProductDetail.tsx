@@ -94,7 +94,7 @@ export default function ProductDetailPage() {
 
   const wishlisted = isInWishlist(product.id);
   const relatedProducts = products.filter((p) => p.category === product.category && p.id !== product.id);
-  const showPrice = product.price > 0;
+  const showPrice = product.price > 0 || (product.originalPrice ?? 0) > 0;
   const inquiryDisabled = product.inquiryOnly || product.showPriceInquiryMode;
 
   return (
@@ -214,7 +214,7 @@ export default function ProductDetailPage() {
               {showPrice && product.originalPrice && (
                 <>
                   <span className="text-sm sm:text-lg text-muted-foreground line-through">{formatPrice(product.originalPrice)}</span>
-                  <Badge className="gradient-purple text-primary-foreground border-0 text-xs">{product.discount}% OFF</Badge>
+                  <Badge className="gradient-purple text-primary-foreground border-0 text-xs">{product.discountName && `${product.discountName} - `}{product.discount}% OFF</Badge>
                 </>
               )}
             </div>

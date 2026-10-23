@@ -153,11 +153,27 @@ export default function OrderHistory() {
                       <p className="text-muted-foreground">
                         {[item.variant_name, item.sku].filter(Boolean).join(" / ")}{item.variant_name || item.sku ? " / " : ""}Qty {item.quantity}
                       </p>
+                      {item.discount_name && (
+                        <div className="mt-1 text-xs">
+                          <p className="text-primary">{item.discount_name}</p>
+                          <p>
+                            <del className="mr-1 text-destructive">{formatMoney(item.original_unit_price ?? 0, order.currency)}</del>
+                            {formatMoney(item.unit_price, order.currency)} each
+                          </p>
+                          <p className="text-muted-foreground">Saved {formatMoney(item.product_discount_total ?? 0, order.currency)}</p>
+                        </div>
+                      )}
                     </div>
                     <span className="shrink-0">{formatMoney(item.line_total, order.currency)}</span>
                   </div>
                 ))}
               </div>
+            )}
+
+            {(order.product_discount_total ?? 0) > 0 && (
+              <p className="mt-2 text-sm text-primary">
+                Product savings (included in total): {formatMoney(order.product_discount_total ?? 0, order.currency)}
+              </p>
             )}
 
             {orderTracking && (
