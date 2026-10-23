@@ -44,7 +44,7 @@ export default function ProductCard({ product, view = "grid" }: ProductCardProps
   const { addItem } = useCart();
   const { toggleWishlist, isInWishlist } = useWishlist();
   const wishlisted = isInWishlist(product.id);
-  const showPrice = product.price > 0;
+  const showPrice = product.price > 0 || (product.originalPrice ?? 0) > 0;
   const inquiryDisabled = product.inquiryOnly || product.showPriceInquiryMode;
 
   if (view === "list") {
@@ -66,7 +66,7 @@ export default function ProductCard({ product, view = "grid" }: ProductCardProps
                   <h3 className="font-display font-semibold text-lg hover:text-primary transition-colors">{product.name}</h3>
                 </Link>
               </div>
-              {product.discount && <Badge className="gradient-purple text-primary-foreground border-0">{product.discount}% OFF</Badge>}
+              {product.discount && <Badge className="gradient-purple text-primary-foreground border-0">{product.discountName && `${product.discountName} - `}{product.discount}% OFF</Badge>}
             </div>
             {product.shortDescription && <p className="text-sm text-muted-foreground mt-1">{product.shortDescription}</p>}
             {product.rating !== undefined && (
@@ -121,7 +121,7 @@ export default function ProductCard({ product, view = "grid" }: ProductCardProps
       {/* Badges */}
       <div className="absolute top-3 left-3 z-10 flex flex-col gap-1">
         {product.discount && (
-          <Badge className="gradient-purple text-primary-foreground border-0 text-xs">{product.discount}% OFF</Badge>
+          <Badge className="gradient-purple text-primary-foreground border-0 text-xs">{product.discountName && `${product.discountName} - `}{product.discount}% OFF</Badge>
         )}
         {product.isNewArrival && (
           <Badge variant="secondary" className="text-xs">New</Badge>
