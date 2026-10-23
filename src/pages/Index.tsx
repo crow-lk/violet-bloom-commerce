@@ -4,6 +4,7 @@ import { ArrowRight, Gem, Scissors, Sparkles, UtensilsCrossed, Home as HomeIcon,
 import heroSaviorPack from "@/assets/hero-savior-pack-v2.webp";
 import heroEverydayFinds from "@/assets/hero-everyday-finds.webp";
 import hero1111Teaser from "@/assets/hero-11-11-teaser-v2.webp";
+import heroAnniversaryMegaSale from "@/assets/hero-anniversary-mega-sale.webp";
 import cod from "@/assets/cod.png";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -89,7 +90,8 @@ const heroSlides = [
 const activeHeroSlides = [
   { title: "Savior Packs", image: heroSaviorPack },
   { title: "Everyday Finds", image: heroEverydayFinds },
-  { title: "11.11 Offer Teaser", image: hero1111Teaser },
+  // { title: "11.11 Offer Teaser", image: hero1111Teaser },
+  { title: "3 Months Anniversary Mega Sale", image: heroAnniversaryMegaSale },
 ];
 
 const PRODUCT_ROTATION_INTERVAL_MS = 15 * 60 * 1000;
