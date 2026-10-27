@@ -13,11 +13,13 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useWishlist } from "@/contexts/WishlistContext";
 import { cn } from "@/lib/utils";
 import { motion, AnimatePresence } from "framer-motion";
+import { useProductColumns } from "@/hooks/use-product-columns";
 import { useCatalog } from "@/hooks/useCatalog";
 import { useToast } from "@/hooks/use-toast";
 import { LAUNCH_MODE } from "@/config/launch";
 
 export default function ProductDetailPage() {
+  const productColumns = useProductColumns();
   const { slug } = useParams();
   const navigate = useNavigate();
   const { products, isLoading } = useCatalog();
@@ -29,6 +31,7 @@ export default function ProductDetailPage() {
   const [selectedImage, setSelectedImage] = useState(0);
   const [quantity, setQuantity] = useState(1);
   const [carouselIdx, setCarouselIdx] = useState(0);
+  useEffect(() => { setCarouselIdx(0); }, [productColumns]);
   const [imageDirection, setImageDirection] = useState(1);
   const [isLightboxOpen, setIsLightboxOpen] = useState(false);
 
@@ -418,13 +421,13 @@ export default function ProductDetailPage() {
                 <Button size="icon" variant="outline" onClick={() => setCarouselIdx(Math.max(0, carouselIdx - 1))} disabled={carouselIdx === 0} className="h-8 w-8 sm:h-10 sm:w-10">
                   <ChevronLeft className="h-3 w-3 sm:h-4 sm:w-4" />
                 </Button>
-                <Button size="icon" variant="outline" onClick={() => setCarouselIdx(Math.min(relatedProducts.length - 4, carouselIdx + 1))} disabled={carouselIdx >= relatedProducts.length - 4} className="h-8 w-8 sm:h-10 sm:w-10">
+                <Button size="icon" variant="outline" onClick={() => setCarouselIdx(Math.min(Math.max(0, relatedProducts.length - productColumns), carouselIdx + 1))} disabled={carouselIdx >= Math.max(0, relatedProducts.length - productColumns)} className="h-8 w-8 sm:h-10 sm:w-10">
                   <ChevronRight className="h-3 w-3 sm:h-4 sm:w-4" />
                 </Button>
               </div>
             </div>
-            <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6">
-              {relatedProducts.slice(carouselIdx, carouselIdx + 4).map((p) => (
+            <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 wide-product-grid gap-3 sm:gap-6">
+              {relatedProducts.slice(carouselIdx, carouselIdx + productColumns).map((p) => (
                 <ProductCard key={p.id} product={p} />
               ))}
             </div>

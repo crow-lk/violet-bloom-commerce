@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import ProductCard from "@/components/products/ProductCard";
 import Layout from "@/components/layout/Layout";
+import { useProductColumns } from "@/hooks/use-product-columns";
 import { useCatalog } from "@/hooks/useCatalog";
 import { CATEGORIES, Product } from "@/types/product";
 import { motion } from "framer-motion";
@@ -64,6 +65,8 @@ function getRotatingProducts(items: Product[], count: number, rotationBucket: nu
 }
 
 export default function Index() {
+  const productColumns = useProductColumns();
+  const featuredCount = productColumns > 4 ? productColumns * 2 : 6;
   const { products, categories } = useCatalog();
   const { data: heroSettings } = useQuery({ queryKey: ["hero-images"], queryFn: getHeroImage });
   const uploadedImages = heroSettings?.images
@@ -76,8 +79,8 @@ export default function Index() {
   const featuredCandidates = products.filter((p) => p.isFeatured);
   const trendingCandidates = products.filter((p) => p.isTrending);
   const featured = getRotatingProducts(
-    featuredCandidates.length >= 6 ? featuredCandidates : products,
-    6,
+    featuredCandidates.length >= featuredCount ? featuredCandidates : products,
+    featuredCount,
     rotationBucket,
     11
   );
@@ -98,7 +101,7 @@ export default function Index() {
       if (!b.flashSaleEndsAt) return -1;
       return new Date(a.flashSaleEndsAt).getTime() - new Date(b.flashSaleEndsAt).getTime();
     });
-  const fallbackFeatured = featured.length ? featured : products.slice(0, 6);
+  const fallbackFeatured = featured.length ? featured : products.slice(0, featuredCount);
   const fallbackTrending = trending.length ? trending : products.slice(0, 8);
   const fallbackDeals = deals.length ? deals : products.slice(0, 4);
   const [currentSlide, setCurrentSlide] = useState(0);
@@ -107,8 +110,9 @@ export default function Index() {
   const latestProducts = [...products]
     .sort((a, b) => new Date(b.updatedAt || b.createdAt || 0).getTime() - new Date(a.updatedAt || a.createdAt || 0).getTime())
     .slice(0, 50);
-  const newArrivals = getRotatingProducts(latestProducts, 4, newArrivalsRotationBucket, 47);
+  const newArrivals = getRotatingProducts(latestProducts, productColumns, newArrivalsRotationBucket, 47);
   const carouselProducts = fallbackTrending.slice(0, 8);
+  useEffect(() => { setCarouselIdx(0); }, [productColumns]);
   const categoryList = categories.length
     ? categories.map((cat) => ({ id: cat.slug, name: cat.name, icon: cat.slug }))
     : CATEGORIES;
@@ -247,8 +251,8 @@ export default function Index() {
                 View All Deals <ArrowRight className="h-4 w-4" />
               </Link>
             </div>
-            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
-              {flashSaleProducts.slice(0, 4).map((product, index) => (
+            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4 wide-product-grid">
+              {flashSaleProducts.slice(0, productColumns).map((product, index) => (
                 <motion.div
                   key={product.id}
                   initial={{ opacity: 0, y: 20 }}
@@ -297,7 +301,7 @@ export default function Index() {
               View All <ArrowRight className="h-4 w-4" />
             </Link>
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 wide-product-grid gap-6">
             {newArrivals.map((p, i) => (
               <motion.div
                 key={p.id}
@@ -359,7 +363,7 @@ export default function Index() {
             </motion.aside>
 
             {/* Featured Products Grid */}
-            <div className="flex-1">
+            <div className="min-w-0 flex-1">
               <div className="flex items-center justify-between mb-6">
                 <div>
                   <h2 className="font-display text-3xl font-bold flex items-center gap-2">
@@ -371,8 +375,8 @@ export default function Index() {
                   View All <ArrowRight className="h-4 w-4" />
                 </Link>
               </div>
-              <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
-                {fallbackFeatured.slice(0, 6).map((p, i) => (
+              <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 wide-product-grid gap-6">
+                {fallbackFeatured.slice(0, featuredCount).map((p, i) => (
                   <motion.div
                     key={p.id}
                     initial={{ opacity: 0, y: 20 }}
@@ -432,13 +436,13 @@ export default function Index() {
               <Button size="icon" variant="outline" onClick={() => setCarouselIdx(Math.max(0, carouselIdx - 1))} disabled={carouselIdx === 0}>
                 <ChevronLeft className="h-4 w-4" />
               </Button>
-              <Button size="icon" variant="outline" onClick={() => setCarouselIdx(Math.min(carouselProducts.length - 4, carouselIdx + 1))} disabled={carouselIdx >= carouselProducts.length - 4}>
+              <Button size="icon" variant="outline" onClick={() => setCarouselIdx(Math.min(Math.max(0, carouselProducts.length - productColumns), carouselIdx + 1))} disabled={carouselIdx >= Math.max(0, carouselProducts.length - productColumns)}>
                 <ChevronRight className="h-4 w-4" />
               </Button>
             </div>
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {carouselProducts.slice(carouselIdx, carouselIdx + 4).map((p, i) => (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 wide-product-grid gap-6">
+            {carouselProducts.slice(carouselIdx, carouselIdx + productColumns).map((p, i) => (
               <motion.div
                 key={p.id}
                 initial={{ opacity: 0, x: 20 }}
@@ -459,7 +463,7 @@ export default function Index() {
             <Flame className="h-7 w-7 text-destructive" /> Hot Deals
           </h2>
           <p className="text-muted-foreground text-center mb-10">Don't miss these limited-time offers</p>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 wide-product-grid gap-6">
             {fallbackDeals.map((p, i) => (
               <motion.div
                 key={p.id}
@@ -558,7 +562,7 @@ export default function Index() {
             <h2 className="font-display text-2xl font-bold">Stay Updated</h2>
             <p className="text-muted-foreground mt-2">Get our honest product reviews every week, with useful insights, recommendations, and new product highlights.</p>
             <form className="flex gap-2 mt-6 max-w-md mx-auto" onSubmit={(e) => e.preventDefault()}>
-              <Input placeholder="Enter your email" type="email" className="flex-1" />
+              <Input placeholder="Enter your email" type="email" className="min-w-0 flex-1" />
               <Button type="submit">Subscribe</Button>
             </form>
           </motion.div>

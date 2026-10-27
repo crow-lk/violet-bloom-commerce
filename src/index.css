@@ -111,7 +111,29 @@
   }
 }
 
+@layer components {
+  /* Widen large monitor layouts while retaining comfortable side margins. */
+  @media (min-width: 2560px) {
+    .container {
+      width: 80%;
+      max-width: 2400px;
+    }
+  }
+}
+
 @layer utilities {
+  /* Keep these breakpoints aligned with useProductColumns. */
+  @media (min-width: 2560px) {
+    .grid.wide-product-grid {
+      grid-template-columns: repeat(6, minmax(0, 1fr));
+    }
+  }
+  @media (min-width: 3200px) {
+    .grid.wide-product-grid {
+      grid-template-columns: repeat(8, minmax(0, 1fr));
+    }
+  }
+
   .gradient-purple {
     background: linear-gradient(135deg, hsl(var(--purple-start)), hsl(var(--purple-mid)), hsl(var(--purple-end)));
   }
