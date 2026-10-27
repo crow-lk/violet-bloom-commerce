@@ -1,10 +1,8 @@
 import { useState, useEffect, useCallback } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { getHeroImage } from "@/lib/api";
 import { Link } from "react-router-dom";
 import { ArrowRight, Gem, Scissors, Sparkles, UtensilsCrossed, Home as HomeIcon, PenTool, Wrench, Baby, Coffee, SprayCan, ChevronLeft, ChevronRight, Mail, Star, Flame, TrendingUp, Gift } from "lucide-react";
-import heroSaviorPack from "@/assets/hero-savior-pack-v2.webp";
-import heroEverydayFinds from "@/assets/hero-everyday-finds.webp";
-import hero1111Teaser from "@/assets/hero-11-11-teaser-v2.webp";
-import heroAnniversaryMegaSale from "@/assets/hero-anniversary-mega-sale.webp";
 import cod from "@/assets/cod.png";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -42,58 +40,6 @@ const CATEGORY_ICONS: Record<string, React.ReactNode> = {
 
 const resolveCategoryIcon = (key: string) => CATEGORY_ICONS[key] || <Gem className="h-6 w-6" />;
 
-// Hero Slider Data
-const heroSlides = [
-  {
-    title: "Savior Packs",
-    subtitle: "Everyday favorites bundled to save the day",
-    cta: "Shop Savior Packs",
-    link: "/shop?filter=flash-sale",
-    badge: "Limited-time picks",
-    image: heroSaviorPack,
-    embeddedText: true,
-  },
-  // {
-  //   title: "Discover Amazing Deals",
-  //   subtitle: "Up to 33% OFF on Beauty & Care",
-  //   cta: "Shop Now",
-  //   link: "/shop?category=beauty",
-  //   badge: "🔥 Hot Deals",
-  //   image: heroDeals,
-  // },
-  {
-    title: "Trending Jewelry",
-    subtitle: "Elegant necklaces, earrings & bracelets",
-    cta: "Explore Collection",
-    link: "/shop?category=jewellery-fashion-accessories",
-    badge: "✨ Trending",
-    image: heroEverydayFinds,
-  },
-  {
-    title: "Home Essentials",
-    subtitle: "Kitchen, storage & cleaning at unbeatable prices",
-    cta: "Shop Home",
-    link: "/shop?category=home-kitchen",
-    badge: "🏠 New Arrivals",
-    image: hero1111Teaser,
-  },
-  {
-    title: "Kids' Favorites",
-    subtitle: "Toys, stationery & fun accessories",
-    cta: "Shop for Kids",
-    link: "/shop?category=toys-kids-items",
-    badge: "🎁 Gift Ideas",
-    image: heroSaviorPack,
-  },
-];
-
-const activeHeroSlides = [
-  { title: "3 Months Anniversary Mega Sale", image: heroAnniversaryMegaSale },
-  { title: "Savior Packs", image: heroSaviorPack },
-  { title: "Everyday Finds", image: heroEverydayFinds },
-  // { title: "11.11 Offer Teaser", image: hero1111Teaser },
-];
-
 const PRODUCT_ROTATION_INTERVAL_MS = 15 * 60 * 1000;
 const NEW_ARRIVALS_ROTATION_INTERVAL_MS = 5 * 60 * 1000;
 const HERO_SLIDE_INTERVAL_MS = 8 * 1000;
@@ -119,6 +65,12 @@ function getRotatingProducts(items: Product[], count: number, rotationBucket: nu
 
 export default function Index() {
   const { products, categories } = useCatalog();
+  const { data: heroSettings } = useQuery({ queryKey: ["hero-images"], queryFn: getHeroImage });
+  const uploadedImages = heroSettings?.images
+    ?? (heroSettings?.image_url ? [{ image_url: heroSettings.image_url }] : []);
+  const activeHeroSlides = uploadedImages
+    .filter((item) => Boolean(item.image_url))
+    .map((item, index) => ({ title: `Featured promotion ${index + 1}`, image: item.image_url }));
   const [rotationBucket, setRotationBucket] = useState(getRotationBucket);
   const [newArrivalsRotationBucket, setNewArrivalsRotationBucket] = useState(getNewArrivalsRotationBucket);
   const featuredCandidates = products.filter((p) => p.isFeatured);
@@ -150,6 +102,7 @@ export default function Index() {
   const fallbackTrending = trending.length ? trending : products.slice(0, 8);
   const fallbackDeals = deals.length ? deals : products.slice(0, 4);
   const [currentSlide, setCurrentSlide] = useState(0);
+  useEffect(() => { setCurrentSlide(0); }, [heroSettings]);
   const [carouselIdx, setCarouselIdx] = useState(0);
   const latestProducts = [...products]
     .sort((a, b) => new Date(b.updatedAt || b.createdAt || 0).getTime() - new Date(a.updatedAt || a.createdAt || 0).getTime())
@@ -161,25 +114,28 @@ export default function Index() {
     : CATEGORIES;
 
   const nextSlide = useCallback(() => {
+    if (activeHeroSlides.length < 2) return;
     setCurrentSlide((prev) => (prev + 1) % activeHeroSlides.length);
-  }, []);
+  }, [activeHeroSlides.length]);
 
   const prevSlide = useCallback(() => {
+    if (activeHeroSlides.length < 2) return;
     setCurrentSlide((prev) => (prev - 1 + activeHeroSlides.length) % activeHeroSlides.length);
-  }, []);
+  }, [activeHeroSlides.length]);
 
   // Auto-play slider
   useEffect(() => {
+    if (activeHeroSlides.length < 2) return;
     const interval = setInterval(nextSlide, HERO_SLIDE_INTERVAL_MS);
     return () => clearInterval(interval);
-  }, [nextSlide]);
+  }, [nextSlide, activeHeroSlides.length]);
 
   useEffect(() => {
     activeHeroSlides.forEach(({ image }) => {
       const preloadedImage = new Image();
       preloadedImage.src = image;
     });
-  }, []);
+  }, [heroSettings]);
 
   useEffect(() => {
     let interval: ReturnType<typeof setInterval>;
@@ -217,7 +173,7 @@ export default function Index() {
   return (
     <Layout>
       {/* Hero Image Slider */}
-      <section className="container mx-auto px-4">
+      {activeHeroSlides.length > 0 && <section className="container mx-auto px-4">
         <div className="relative aspect-[2/1] overflow-hidden">
           {activeHeroSlides.map((slide, index) => (
           <div
@@ -237,6 +193,7 @@ export default function Index() {
           </div>
           ))}
 
+        {activeHeroSlides.length > 1 && <>
         {/* Slider Controls */}
           <button
           onClick={prevSlide}
@@ -266,8 +223,9 @@ export default function Index() {
             />
           ))}
           </div>
+        </>}
         </div>
-      </section>
+      </section>}
 
       {flashSaleProducts.length > 0 && (
         <section className="border-t border-destructive/15 bg-gradient-to-br from-destructive/10 via-background to-primary/10 py-12">
