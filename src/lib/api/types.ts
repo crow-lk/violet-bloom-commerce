@@ -186,6 +186,7 @@ export interface ApiAuthResponse {
 }
 
 export interface ApiSettingsHeroImage {
+  images?: { image_path: string; image_url: string }[];
   image_path?: string | null;
   image_url?: string | null;
 }
