@@ -296,7 +296,7 @@ const savePhone = async (phone: string) => {
 
           <TabsContent value="wishlist" className="mt-6">
             {wishlistProducts.length > 0 ? (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 wide-product-grid gap-6">
                 {wishlistProducts.map((p) => (
                   <ProductCard key={p.id} product={p} />
                 ))}
