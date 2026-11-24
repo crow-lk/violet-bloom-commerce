@@ -35,7 +35,19 @@ export const register = (payload: { name: string; email: string; mobile?: string
 export const forgotPassword = (payload: { email: string }) =>
   apiFetch<{ message: string }>("/auth/forgot-password", { method: "POST", json: payload });
 
-export const resetPassword = (payload: { token: string; email: string; password: string; password_confirmation: string }) =>
+export const sendPasswordResetSms = (payload: { mobile: string }) =>
+  apiFetch<{ message: string; expires_in_minutes: number; resend_after_seconds: number }>("/auth/forgot-password/sms", {
+    method: "POST",
+    json: payload,
+  });
+
+export const verifyPasswordResetSms = (payload: { mobile: string; code: string }) =>
+  apiFetch<{ token: string; expires_in_minutes: number }>("/auth/forgot-password/sms/verify", { method: "POST", json: payload });
+
+export const resetPasswordWithSms = (payload: { token: string; password: string; password_confirmation: string }) =>
+  apiFetch<{ message: string }>("/auth/reset-password/sms", { method: "POST", json: payload });
+
+export const resetPassword =(payload: { token: string; email: string; password: string; password_confirmation: string }) =>
   apiFetch<{ message: string }>("/auth/reset-password", { method: "POST", json: payload });
 
 export const logout = () => apiFetch<{ message: string }>("/auth/logout", { method: "POST" });

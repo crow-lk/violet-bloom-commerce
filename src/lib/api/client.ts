@@ -28,6 +28,15 @@ export class ApiError extends Error {
   }
 }
 
+/** A user-facing message for a failed request: the first Laravel validation error, if any. */
+export function getApiErrorMessage(error: unknown, fallback: string) {
+  if (!(error instanceof ApiError)) return fallback;
+  if (error.status === 429) return "Too many attempts. Please wait a minute and try again.";
+  const errors = (error.payload as { errors?: Record<string, string[]> } | undefined)?.errors;
+  const first = errors ? Object.values(errors).flat()[0] : undefined;
+  return first || error.message || fallback;
+}
+
 function buildHeaders(init?: HeadersInit, includeJson = true) {
   const headers = new Headers(init || {});
   headers.set("Accept", "application/json");
