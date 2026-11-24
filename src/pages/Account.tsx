@@ -204,7 +204,14 @@ const savePhone = async (phone: string) => {
                 <Input type="email" required className="mt-1" placeholder="you@example.com" value={authForm.email} onChange={(e) => setAuthForm({ ...authForm, email: e.target.value })} />
               </div>
               <div>
-                <Label>Password</Label>
+                <div className="flex items-center justify-between">
+                  <Label>Password</Label>
+                  {!isSignUp && (
+                    <Link to="/forgot-password" className="text-sm text-primary hover:underline">
+                      Forgot password?
+                    </Link>
+                  )}
+                </div>
                 <Input type="password" required className="mt-1" placeholder="••••••••" value={authForm.password} onChange={(e) => setAuthForm({ ...authForm, password: e.target.value })} />
               </div>
               {isSignUp && (

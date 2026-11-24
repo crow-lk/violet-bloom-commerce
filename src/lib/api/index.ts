@@ -32,6 +32,12 @@ export const login = (payload: { email: string; password: string }) =>
 export const register = (payload: { name: string; email: string; mobile?: string; password: string }) =>
   apiFetch<ApiAuthResponse>("/auth/register", { method: "POST", json: payload });
 
+export const forgotPassword = (payload: { email: string }) =>
+  apiFetch<{ message: string }>("/auth/forgot-password", { method: "POST", json: payload });
+
+export const resetPassword = (payload: { token: string; email: string; password: string; password_confirmation: string }) =>
+  apiFetch<{ message: string }>("/auth/reset-password", { method: "POST", json: payload });
+
 export const logout = () => apiFetch<{ message: string }>("/auth/logout", { method: "POST" });
 export const getMe = () => apiFetch<ApiUser>("/auth/me");
 export const updateProfile = (payload: { name: string; email: string; mobile?: string | null }) =>
