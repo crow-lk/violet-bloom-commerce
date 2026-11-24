@@ -124,6 +124,18 @@ Response: `200` object with `token` and `user`.
 Response on unsupported provider: `422`.
 Response on invalid token: `422` validation error.
 
+**POST /api/auth/forgot-password**
+Auth: none. Rate limited to 6 requests per minute.
+Request body (JSON): `email`.
+Response: `200` with `{ "message": "..." }`. The response is identical whether or not the email belongs to an account.
+If it does, the user is emailed a link to `{FRONTEND_URL}/reset-password?token=...&email=...` (valid for 60 minutes).
+
+**POST /api/auth/reset-password**
+Auth: none. Rate limited to 6 requests per minute.
+Request body (JSON): `token`, `email`, `password` (min 8), `password_confirmation`.
+Response: `200` with `{ "message": "Your password has been reset." }`. All of the user's existing API tokens are revoked.
+Response on invalid/expired token or unknown email: `422` validation error on `email`.
+
 **GET /api/auth/me**
 Auth required.
 Request: none.
@@ -222,7 +234,6 @@ Request body (JSON or multipart):
 - `payment_id` (nullable) or `payment_method_id` (nullable). One is required.
 - `session_id` (required for guests).
 - `currency` (optional, 3 letters).
-- `shipping_total` (optional number).
 - `notes` (optional string).
 - `shipping.first_name`, `shipping.last_name`, `shipping.address_line1`, `shipping.address_line2` (optional), `shipping.city`, `shipping.country`, `shipping.postal_code` (optional), `shipping.email`, `shipping.phone`.
 - `billing` object (optional): `first_name`, `last_name`, `address_line1`, `address_line2`, `city`, `country`, `postal_code`, `email`, `phone`.
