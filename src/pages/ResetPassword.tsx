@@ -4,19 +4,11 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import Layout from "@/components/layout/Layout";
-import { resetPassword } from "@/lib/api";
-import { ApiError } from "@/lib/api/client";
+import { resetPassword, resetPasswordWithSms } from "@/lib/api";
+import { getApiErrorMessage } from "@/lib/api/client";
 import { useToast } from "@/hooks/use-toast";
 
 const MIN_PASSWORD_LENGTH = 8;
-
-function firstValidationError(error: unknown): string | null {
-  if (!(error instanceof ApiError)) return null;
-  if (error.status === 429) return "Too many attempts. Please wait a minute and try again.";
-  const errors = (error.payload as { errors?: Record<string, string[]> } | undefined)?.errors;
-  const first = errors ? Object.values(errors).flat()[0] : undefined;
-  return first || error.message || null;
-}
 
 export default function ResetPasswordPage() {
   const [searchParams] = useSearchParams();
@@ -24,6 +16,9 @@ export default function ResetPasswordPage() {
   const { toast } = useToast();
   const token = searchParams.get("token") || "";
   const email = searchParams.get("email") || "";
+  // Set when the customer verified an SMS code instead of following an email link.
+  const mobile = searchParams.get("mobile") || "";
+  const account = email || mobile;
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -44,17 +39,21 @@ export default function ResetPasswordPage() {
 
     setIsSubmitting(true);
     try {
-      await resetPassword({ token, email, password, password_confirmation: confirmPassword });
+      if (email) {
+        await resetPassword({ token, email, password, password_confirmation: confirmPassword });
+      } else {
+        await resetPasswordWithSms({ token, password, password_confirmation: confirmPassword });
+      }
       toast({ title: "Password reset", description: "You can now log in with your new password." });
       navigate("/account", { replace: true });
     } catch (err) {
-      setError(firstValidationError(err) || "Could not reset your password. Please try again.");
+      setError(getApiErrorMessage(err, "Could not reset your password. Please try again."));
     } finally {
       setIsSubmitting(false);
     }
   };
 
-  if (!token || !email) {
+  if (!token || !account) {
     return (
       <Layout>
         <div className="container mx-auto px-4 py-16 max-w-md">
@@ -78,7 +77,7 @@ export default function ResetPasswordPage() {
         <div className="glass rounded-2xl p-8 shadow-purple">
           <h1 className="font-display text-2xl font-bold text-center mb-2">Set a New Password</h1>
           <p className="text-sm text-muted-foreground text-center mb-6">
-            Choose a new password for <span className="font-medium text-foreground">{email}</span>.
+            Choose a new password for <span className="font-medium text-foreground">{account}</span>.
           </p>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>

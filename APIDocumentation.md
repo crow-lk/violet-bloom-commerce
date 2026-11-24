@@ -130,6 +130,25 @@ Request body (JSON): `email`.
 Response: `200` with `{ "message": "..." }`. The response is identical whether or not the email belongs to an account.
 If it does, the user is emailed a link to `{FRONTEND_URL}/reset-password?token=...&email=...` (valid for 60 minutes).
 
+**POST /api/auth/forgot-password/sms**
+Auth: none. Rate limited to 6 requests per minute.
+Request body (JSON): `mobile` (any common Sri Lankan format, e.g. `0771234567`, `+94771234567`).
+Response: `200` with `{ "message": "...", "expires_in_minutes": 10, "resend_after_seconds": 60 }`. The response is identical whether or not the number is registered.
+If exactly one account uses the number, a 6-digit code is sent by SMS (Notify.lk). Repeat requests for the same number within 60 seconds are ignored.
+Response on a malformed number: `422` validation error on `mobile`.
+
+**POST /api/auth/forgot-password/sms/verify**
+Auth: none. Rate limited to 6 requests per minute.
+Request body (JSON): `mobile`, `code` (6 digits).
+Response: `200` with `{ "token": "...", "expires_in_minutes": 30 }`. Submit the token to `POST /api/auth/reset-password/sms` with the new password.
+Response on a wrong or expired code: `422` validation error on `code`. Codes are single-use and are discarded after 5 wrong attempts.
+
+**POST /api/auth/reset-password/sms**
+Auth: none. Rate limited to 6 requests per minute.
+Request body (JSON): `token` (from the verify step), `password` (min 8), `password_confirmation`.
+Response: `200` with `{ "message": "Your password has been reset." }`. All of the user's existing API tokens are revoked. Works for accounts without an email address.
+Response on an expired or already-used token: `422` validation error on `token`.
+
 **POST /api/auth/reset-password**
 Auth: none. Rate limited to 6 requests per minute.
 Request body (JSON): `token`, `email`, `password` (min 8), `password_confirmation`.
